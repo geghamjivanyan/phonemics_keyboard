@@ -1,0 +1,28 @@
+{
+  "singleQuote": false,
+  "semi": true,
+  "printWidth": 95,
+  "jsxSingleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "jsxBracketSameLine": false,
+  "useTabs": false,
+  "endOfLine": "lf",
+
+  "overrides": [
+    {
+      "files": "*.js",
+      "options": {
+        "parser": "babel"
+      }
+    },
+    {
+      "files": "*.styled.js",
+      "options": {
+        "parser": "babel"
+      }
+    }
+  ]
+}
