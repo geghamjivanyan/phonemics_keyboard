@@ -34,5 +34,6 @@ export const KEYS = [
     { id: 26, english: "v", arabic: "\u0627", color: "#FAEBD7" },
     { id: 27, english: "w", arabic: "\u0648", color: "#ADD8E6" },
     { id: 28, english: "x", arabic: "\u064A", color: "#D8BFD8" },
+    { id: 28, english: "x", arabic: "\u064A", color: "#D8BFD8" },
   ],
 ];
