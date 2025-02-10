@@ -13,7 +13,7 @@ export const KEYS = [
     { id: 4, english: "d", arabic: "\u0642", color: BLUE },
     { id: 5, english: "e", arabic: "\u062c", color: YELLOW },
     { id: 6, english: "f", arabic: "\u0647", color: RED },
-    { id: 7, english: "%", arabic: "\u066A", color: WHITE },
+    { id: 7, english: "%", arabic: "\u0647", color: WHITE },
   ],
   [
     { id: 8, english: "y", arabic: ">", color: WHITE },
