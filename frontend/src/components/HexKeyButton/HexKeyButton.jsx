@@ -3,6 +3,7 @@ import "./HexKeyButton.css";
 export const HexKeyButton = ({ color, arabic, english, onClick }) => {
   return (
     <button
+      aria-label={`Key: ${arabic}`}
       className="hex-key-wrapper"
       style={{ backgroundColor: color }}
       onClick={() => onClick(arabic)}

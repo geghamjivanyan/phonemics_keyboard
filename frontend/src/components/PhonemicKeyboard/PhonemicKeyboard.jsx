@@ -34,7 +34,7 @@ export const PhonemicKeyboard = () => {
           </div>
         ))}
       </div>
-      <div className="typed-text">{typedText}</div>
+      <div className="typed-text" dir="rtl">{typedText}</div>
     </div>
   );
 };
