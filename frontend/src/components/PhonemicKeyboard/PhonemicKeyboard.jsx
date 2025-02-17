@@ -19,20 +19,18 @@ export const PhonemicKeyboard = () => {
     setTypedText((prev: string) => prev.slice(0, -1));
   };
 
-
-
-    function handleKeyClick(key: KeyboardKey): void {
+  function handleKeyClick(key: KeyboardKey): void {
     if (key.action === "delete") {
-      deleteLastCharacter();
-      return
+        deleteLastCharacter();
+        return;
     }
-      if (key.action === "clef") {
-          console.log("Clef Clicked!",key)
-          return
-      }
 
-      insertCharacter(key.arabic);
+    if (key.action === "clef") {
+        console.log("Clef Clicked!", key, "typedText: ", typedText)
+        return;
+    }
 
+    insertCharacter(key.arabic);
   }
 
   return (
