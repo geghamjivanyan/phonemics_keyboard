@@ -1,10 +1,11 @@
 import { useState } from "react";
+
 import { KEYS } from "../../utils";
 import { HexKeyButton } from "../HexKeyButton";
+import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
 
 const SPACE_BETWEEN_ROW = 90;
-
 
 export const PhonemicKeyboard = () => {
   const [typedText, setTypedText] = useState("");
@@ -34,7 +35,8 @@ export const PhonemicKeyboard = () => {
           </div>
         ))}
       </div>
-      <div className="typed-text" dir="rtl">{typedText}</div>
+
+      <TypedText typedText={typedText} />
     </div>
   );
 };
