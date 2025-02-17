@@ -47,9 +47,7 @@ export const PhonemicKeyboard = () => {
             {row.map((keyData:KeyboardKey) => (
               <HexKeyButton
                 key={keyData.id}
-                color={keyData.color}
-                arabic={keyData.arabic}
-                english={keyData.english}
+                keyData={keyData}
                 onClick={() => handleKeyClick(keyData)}
               />
             ))}
