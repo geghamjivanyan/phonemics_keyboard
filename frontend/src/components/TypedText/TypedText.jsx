@@ -5,7 +5,7 @@ export const TypedText = ({ typedText }) => {
   const filteredRecommendations =
     typedText.trim().length > 0
       ? patternRecommendations.data.filter((item) =>
-          item.pattern.startsWith(typedText),
+          item.name.startsWith(typedText),
         )
       : [];
 
