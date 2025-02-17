@@ -6,7 +6,7 @@ export const HexKeyButton = ({ color, arabic, english, onClick }) => {
       aria-label={`Key: ${arabic}`}
       className="hex-key-wrapper"
       style={{ backgroundColor: color }}
-      onClick={() => onClick(arabic)}
+      onClick={onClick}
     >
       <span className="arabic">{arabic}</span>
       <span className="english">{english}</span>

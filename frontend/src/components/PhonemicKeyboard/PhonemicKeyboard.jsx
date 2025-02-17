@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import type { KeyboardKey } from "../../interfaces";
 import { KEYS } from "../../utils";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
@@ -10,26 +11,46 @@ const SPACE_BETWEEN_ROW = 90;
 export const PhonemicKeyboard = () => {
   const [typedText, setTypedText] = useState("");
 
-  const handleKeyClick = (key) => {
-    setTypedText((prev) => prev + key);
+  const insertCharacter = (char): void => {
+    setTypedText((prev) => prev + char);
   };
+
+  const deleteLastCharacter = (): void => {
+    setTypedText((prev: string) => prev.slice(0, -1));
+  };
+
+
+
+    function handleKeyClick(key: KeyboardKey): void {
+    if (key.action === "delete") {
+      deleteLastCharacter();
+      return
+    }
+      if (key.action === "clef") {
+          console.log("Clef Clicked!",key)
+          return
+      }
+
+      insertCharacter(key.arabic);
+
+  }
 
   return (
     <div className="keyboard-container">
       <div className="keyboard">
-        {KEYS.map((row, rowIndex) => (
+        {KEYS.map((row: Array<KeyboardKey>, rowIndex: number) => (
           <div
             className="keyboard-row"
             key={rowIndex}
             style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
           >
-            {row.map((keyData) => (
+            {row.map((keyData:KeyboardKey) => (
               <HexKeyButton
                 key={keyData.id}
                 color={keyData.color}
                 arabic={keyData.arabic}
                 english={keyData.english}
-                onClick={handleKeyClick}
+                onClick={() => handleKeyClick(keyData)}
               />
             ))}
           </div>

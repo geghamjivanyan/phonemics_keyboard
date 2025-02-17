@@ -1,31 +1,30 @@
 .hex-key-wrapper {
-    width: 120px;
-    height: 120px;
-    border: none;
-    font-size: 1rem;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
+  width: 120px;
+  height: 120px;
+  border: none;
+  font-size: 1rem;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
 
-    &:hover {
-        cursor: pointer;
-        transform: scale(1.05);
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
-    }
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+  }
 
-    .arabic {
-        font-size: 3rem;
-        font-weight: 500;
-    }
+  .arabic {
+    font-size: 3rem;
+    font-weight: 500;
+  }
 
-    .english {
-        font-size: 0.8rem;
-        margin: 1.5rem 0 0 1rem
-    }
+  .english {
+    font-size: 0.8rem;
+    margin: 1.5rem 0 0 1rem;
+  }
 }
-
-
-
