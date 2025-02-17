@@ -3,12 +3,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
     background-color: #b4b596;
 }
 
 .keyboard {
     position: relative;
-    width: calc(8 * 125px);
+    width: 75%;
     height: 600px;
     display: flex;
     flex-direction: column;
