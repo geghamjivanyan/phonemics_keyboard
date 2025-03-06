@@ -18,8 +18,23 @@ from django.contrib import admin
 from django.urls import path
 
 from .api.rhythms import RhythmView
+from .api.koran import KoranView
+from .api.words import WordView
+from .api.translit_koran import TranslitKoranView
+from .api.translit_words import TranslitWordView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rhythms/', RhythmView.as_view()),
+    path('koran/', KoranView.as_view()),
+    path('remove/', TranslitWordView.remove),
+    path('words/', WordView.as_view()),
+    path('search/', WordView.search),
+    path('translit/', TranslitKoranView.as_view()),
+    path('split/', TranslitKoranView.split),
+    path('translit_words/', TranslitWordView.as_view()),
+    path('manage/pattern', TranslitWordView.manage_pattern),
+    path('easy_shrift', KoranView.easy_shrift),
+    path('word/easy_shrift', WordView.easy_shrift),
+    path('dots/', WordView.remove_dots),
 ]

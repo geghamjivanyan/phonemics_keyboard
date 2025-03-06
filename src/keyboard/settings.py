@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -27,7 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 # Application definition
 
 INSTALLED_APPS = [
