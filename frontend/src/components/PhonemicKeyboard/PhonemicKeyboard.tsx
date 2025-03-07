@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { KEYBOARD_1, KEYBOARD_2 } from "../../utils";
+import { DOT_TRANSFORMATIONS, KEYBOARD_1, KEYBOARD_2 } from "../../utils";
 import { KeyboardActions, KeyboardKey } from "../../interfaces";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
@@ -16,6 +16,14 @@ export const PhonemicKeyboard = () => {
     setTypedText((prev) => prev + char);
   };
 
+  const handleDotInput = () => {
+    setTypedText((prev) => {
+      const lastChar = prev.slice(-1);
+      const replacement = DOT_TRANSFORMATIONS[lastChar];
+      return replacement ? prev.slice(0, -1) + replacement : prev + ".";
+    });
+  };
+
   const deleteLastCharacter = (): void => {
     setTypedText((prev: string) => prev.slice(0, -1));
   };
@@ -25,6 +33,9 @@ export const PhonemicKeyboard = () => {
       case KeyboardActions.DELETE:
         deleteLastCharacter();
         return;
+      case KeyboardActions.DOT:
+        handleDotInput();
+        break;
       case KeyboardActions.ENTER:
         console.log("ENTER", typedText);
         return;
