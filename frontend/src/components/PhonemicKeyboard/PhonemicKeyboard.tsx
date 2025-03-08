@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-import { DOT_TRANSFORMATIONS, KEYBOARD_1, KEYBOARD_2 } from "../../utils";
+import {
+  DOT_TRANSFORMATIONS,
+  SPACE_TRANSFORMATIONS,
+  KEYBOARD_1,
+  KEYBOARD_2,
+} from "../../utils";
 import { KeyboardActions, KeyboardKey } from "../../interfaces";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
@@ -24,8 +29,25 @@ export const PhonemicKeyboard = () => {
     });
   };
 
+  const handleSpaceInput = () => {
+    setTypedText((prev) => {
+      const newText = prev + " ";
+      return applyTransformations(newText);
+    });
+  };
+
   const deleteLastCharacter = (): void => {
     setTypedText((prev: string) => prev.slice(0, -1));
+  };
+
+  const applyTransformations = (text: string): string => {
+    let transformed = text;
+    SPACE_TRANSFORMATIONS.slice()
+      .reverse()
+      .forEach(({ pattern, replace }: { pattern: RegExp; replace: string }) => {
+        transformed = transformed.replace(pattern, replace);
+      });
+    return transformed;
   };
 
   function handleKeyClick(key: KeyboardKey): void {
@@ -35,7 +57,10 @@ export const PhonemicKeyboard = () => {
         return;
       case KeyboardActions.DOT:
         handleDotInput();
-        break;
+        return;
+      case KeyboardActions.SPACE:
+        handleSpaceInput();
+        return;
       case KeyboardActions.ENTER:
         console.log("ENTER", typedText);
         return;
@@ -52,6 +77,7 @@ export const PhonemicKeyboard = () => {
       prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
     );
   };
+
   return (
     <div className="keyboard-container">
       <div className="keyboard">
