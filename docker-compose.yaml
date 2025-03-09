@@ -40,9 +40,10 @@ services:
     stdin_open: true
     tty: true
     env_file: env
-    command: bash -c 'python3 manage.py src.manage.py'
-    networks:
-      pgnet:
+    command: >
+      bash -c '
+      python3 src/manage.py migrate &&
+      python3 src/manage.py runserver 0.0.0.0:8000'
 
 
 volumes:
