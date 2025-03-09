@@ -13,3 +13,4 @@ wcwidth==0.1.7
 PyJWT
 requests==2.26.0
 redis
+beautifulsoup4==4.13.3
