@@ -5,8 +5,8 @@ import {
   SPACE_TRANSFORMATIONS,
   KEYBOARD_1,
   KEYBOARD_2,
-} from "../../utils";
-import { KeyboardActions, KeyboardKey } from "../../interfaces";
+} from "../../util";
+import { KeyboardActions, KeyboardKey } from "../../interface";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
