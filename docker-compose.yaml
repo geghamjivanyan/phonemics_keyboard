@@ -40,7 +40,7 @@ services:
     stdin_open: true
     tty: true
     env_file: env
-    command: bash -c ''
+    command: bash -c 'python3 manage.py src.manage.py'
     networks:
       pgnet:
 
