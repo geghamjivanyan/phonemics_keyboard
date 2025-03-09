@@ -1,7 +1,7 @@
-import { patternRecommendations } from "../../utils";
+import { patternRecommendations } from "../../util";
 import "./TypedText.css";
 
-export const TypedText = ({ typedText }) => {
+export const TypedText = ({ typedText }: { typedText: string }) => {
   const normalizedTypedText = typedText.trim().toLocaleLowerCase();
 
   const filteredRecommendations =
