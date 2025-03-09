@@ -1,5 +1,5 @@
 import "./App.css";
-import { PhonemicKeyboard } from "./components/PhonemicKeyboard";
+import { PhonemicKeyboard } from "./component/PhonemicKeyboard";
 
 function App() {
   return (

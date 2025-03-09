@@ -1,4 +1,4 @@
-import { KeyboardKey, KeyboardActions } from "../interfaces";
+import { KeyboardKey, KeyboardActions } from "../interface";
 
 const WHITE = "#FAFAFA"; // (250,250,250)
 const YELLOW = "#E6E6B4"; // (230,230,180)

@@ -1,4 +1,4 @@
-import { KeyboardActions } from "../../interfaces";
+import { KeyboardActions } from "../../interface";
 import spacebar from "../../assets/spacebar.svg";
 import enter from "../../assets/enter.svg";
 import globe from "../../assets/globe.png";
