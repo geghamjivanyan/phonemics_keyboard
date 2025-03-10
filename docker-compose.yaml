@@ -45,6 +45,19 @@ services:
       python3 src/manage.py migrate &&
       python3 src/manage.py runserver 0.0.0.0:8000'
 
+  frontend:
+    image: frontend:latest
+    build:
+      dockerfile: DockerfileFront
+      context: .
+    volumes:
+      - .:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
+    networks:
+      pgnet:
+
 
 volumes:
   pgdata:
