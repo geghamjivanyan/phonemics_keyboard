@@ -1,9 +1,9 @@
 Task 1
 
-when user type , we should change left part with right. 
-It means every time when we see user type '.' 
+when user type , we should change left part with right.
+It means every time when we see user type '.'
 we check if previous letter is from left part and change
-that letter + '.' with right one   
+that letter + '.' with right one
 
 062D + . = 062E   (ح خ)
 062E + . = 062C   (خ ج)
@@ -23,7 +23,7 @@ that letter + '.' with right one
 
 Task 2
 
-Logic is the same. here + means space ' ' 
+Logic is the same. here + means space ' '
 
 {
  +فَأ+ُ=فَأُ
@@ -228,28 +228,28 @@ Logic is the same. here + means space ' '
 ِ+ُ=يُ
 ِ+ُ+ِ=ِ+وِ
 
- ا + ُ = او   
- ا + ِ = اي  
+ ا + ُ = او
+ ا + ِ = اي
 
- ي + َ = ِ + يَ  
- ي + ُ = ِ + يُ  
+ ي + َ = ِ + يَ
+ ي + ُ = ِ + يُ
 
- و + َ = ُ + وَ  
- و + ِ = ُ + وِ   
+ و + َ = ُ + وَ
+ و + ِ = ُ + وِ
 
 
 
 اء+َ=اءَ
-اءَ+.=اءً+ 
-َ+.=اً+ 
-أَ+.=أً+ 
+اءَ+.=اءً+
+َ+.=اً+
+أَ+.=أً+
 
 
-ةَ+.=ةً+ 
-ا+َ+.=اً+ 
+ةَ+.=ةً+
+ا+َ+.=اً+
 
-ُ+.=ٌ+ 
-ِ+.=ٍ+ 
+ُ+.=ٌ+
+ِ+.=ٍ+
 
 
 ِ+ء=ِ+ئ
@@ -272,8 +272,8 @@ Logic is the same. here + means space ' '
 ء+َ=أَ
 ء+ُ=ؤُ
 ء+ِ=ئِ
-اء+ُ+ =اءُ+ 
-اء+ِ+ =اءِ+ 
+اء+ُ+ =اءُ+
+اء+ِ+ =اءِ+
 
 ا+َ=ا+َ
 ا+ُ=او
@@ -288,8 +288,8 @@ Logic is the same. here + means space ' '
 َ+أ+ُ=َ+ؤُ
 َ+أ+َ=َ+أَ
 
-ا+.=ى+ 
-ُ+و+ =وا+ 
+ا+.=ى+
+ُ+و+ =وا+
 
  +َ+.=أَن
  +ِ+.=إِن
@@ -413,20 +413,20 @@ Logic is the same. here + means space ' '
 عَبدالء+ِ=عَبدالإِ
 اللا+ه=اللّه
 
- + =،+ 
-،+،=.+ 
+ + =،+
+،+،=.+
 
 ه+.=ة+
 }
 
-Task3 
+Task3
 
-Whenever user type any letter, text should be send to backend.  
-Backend will manage and send back response 
+Whenever user type any letter, text should be send to backend.
+Backend will manage and send back response
 {
     'rhythms': [list of rhythms],
     'suggestions': [list of text suggestions]
 }
 
-when rhythms list is not empty text color and background should be changed 
+when rhythms list is not empty text color and background should be changed
 when suggestions list is not empty user should see suggestions like when we type something in google
