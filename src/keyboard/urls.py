@@ -27,7 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('rhythms/', RhythmView.as_view()),
     path('koran/', KoranView.as_view()),
-    path('remove/', TranslitWordView.remove),
+    path('words/translit/remove/', TranslitWordView.remove),
     path('words/', WordView.as_view()),
     path('search/', WordView.search),
     path('translit/', TranslitKoranView.as_view()),
@@ -37,4 +37,7 @@ urlpatterns = [
     path('easy_shrift', KoranView.easy_shrift),
     path('word/easy_shrift', WordView.easy_shrift),
     path('dots/', WordView.remove_dots),
+    path('words/remove', WordView.remove),
+    path('koran/remove', KoranView.remove),
+    path('koran/translit/remove', TranslitKoranView.remove)
 ]

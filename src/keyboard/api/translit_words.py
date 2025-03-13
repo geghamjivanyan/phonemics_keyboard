@@ -160,12 +160,7 @@ class TranslitWordView(View):
     @staticmethod
     def remove(request):
         objs = TranslitWord.objects.all()
-
-        i = 0
         for obj in objs:
-            if i % 1000 == 0:
-                print("I", i)
-            i+=1
             obj.delete()
 
     @staticmethod

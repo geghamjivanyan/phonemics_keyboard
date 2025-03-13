@@ -34,15 +34,28 @@ class KoranView(View):
 
             blocks = re.split(pattern, chapter.text)
 
-            result = [block.strip() for block in blocks if block.strip()]
-
             for j in range(len(blocks) - 1):
-                Koran(chapter=f"{i+1:03d}", block=f"{j+1:03d}", arabic=blocks[j]).save()
+                text = self._manage_text(blocks[j])
+
+                Koran(chapter=f"{i+1:03d}", block=f"{j+1:03d}", arabic=text).save()
 
         return HttpResponse(
             status=200,
             content_type="application/json; charset=utf-8",
         )
+    
+    def _manage_text(self, text):
+
+        text = text.strip().replace(chr(0x0652).encode('utf-8'), '')
+        diacritics = [
+            chr(0x0650).encode('utf-8'), 
+            chr(0x064F).encode('utf-8'), 
+            chr(0x064E).encode('utf-8')
+        ]
+        if text[-1] in diacritics:
+            text = text[:-1]
+
+        return text
 
     @staticmethod
     def remove_all(request):
@@ -101,3 +114,9 @@ class KoranView(View):
             block.save()
 
         return HttpResponse("OK")
+    
+    @staticmethod
+    def remove(request):
+        objs = Koran.objects.all()
+        for obj in objs:
+            obj.delete()
