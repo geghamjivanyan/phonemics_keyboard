@@ -46,11 +46,11 @@ class KoranView(View):
     
     def _manage_text(self, text):
 
-        text = text.strip().replace(chr(0x0652).encode('utf-8'), '')
+        text = text.strip().replace(chr(0x0652).encode('utf-8').decode('utf-8'), '')
         diacritics = [
-            chr(0x0650).encode('utf-8'), 
-            chr(0x064F).encode('utf-8'), 
-            chr(0x064E).encode('utf-8')
+            chr(0x0650).encode('utf-8').decode('utf-8'), 
+            chr(0x064F).encode('utf-8').decode('utf-8'), 
+            chr(0x064E).encode('utf-8').decode('utf-8')
         ]
         if text[-1] in diacritics:
             text = text[:-1]
