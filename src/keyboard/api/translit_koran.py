@@ -45,6 +45,7 @@ class TranslitKoranView(View):
                     cb = line.split(' ')[0].split('.')
                     chapter = f'{int(cb[0]):03d}'
                     block = cb[2]
+                    line = line.replace('*', '')
                     text = line.split(' ')[1]
                     if text[0] == '.':
                         text = text[1:]
@@ -101,8 +102,19 @@ class TranslitKoranView(View):
                 s += res[i]
                 i += 1
         s += res[-1]
+
+        s = s.strip()
+
+        if len(s) >= 4 and TranslitKoranView.is_cvvc(s[-4:]):
+            s = s[:-1] + ' ' + s[-1]
         
-        return s.strip()
+        return s
+    
+    @staticmethod
+    def is_cvvc(text):
+
+        return not is_vowel(text[0]) and is_vowel(text[1]) and \
+            is_vowel(text[2]) and not is_vowel(text[3])
 
     @staticmethod
     def classify(text):
@@ -132,3 +144,9 @@ class TranslitKoranView(View):
             status=200,
             content_type="application/json; charset=utf-8",
         )
+    
+    @staticmethod
+    def remove(request):
+        objs = TranslitKoran.objects.all()
+        for obj in objs:
+            obj.delete()

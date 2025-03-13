@@ -185,6 +185,12 @@ class WordView(View):
         return HttpResponse("Before {} -> After {}".format(txt, text))
 
 
+    @staticmethod
+    def remove(request):
+        objs = Word.objects.all()
+        for obj in objs:
+            obj.delete()
+
     """
     062E + . = 062C   (خ ج)
     066E + . = 0628   (ب)
