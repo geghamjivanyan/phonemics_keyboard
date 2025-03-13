@@ -421,7 +421,7 @@ Logic is the same. here + means space ' '
 
 Task3 
 
-Whenever user type any letter, text should be send to backend. 
+Whenever user type any letter, text should be send to backend.  
 Backend will manage and send back response 
 {
     'rhythms': [list of rhythms],
