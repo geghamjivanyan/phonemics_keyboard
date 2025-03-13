@@ -18,10 +18,19 @@ export const PhonemicKeyboard = () => {
   const [activeKeyboard, setActiveKeyboard] = useState(KEYBOARD_1);
 
   const insertCharacter = (char: string): void => {
-    setTypedText((prev) => prev + char);
+    setTypedText((prev) => {
+      if (prev.endsWith(".")) {
+        const transformed = DOT_TRANSFORMATIONS[char];
+        if (transformed) {
+          return prev.slice(0, -1) + transformed;
+        }
+      }
+
+      return prev + char;
+    });
   };
 
-  const handleDotInput = () => {
+  const handleDotInput = (): void => {
     setTypedText((prev) => {
       const lastChar = prev.slice(-1);
       const replacement = DOT_TRANSFORMATIONS[lastChar];
@@ -29,7 +38,7 @@ export const PhonemicKeyboard = () => {
     });
   };
 
-  const handleSpaceInput = () => {
+  const handleSpaceInput = (): void => {
     setTypedText((prev) => {
       const newText = prev + " ";
       return applyTransformations(newText);
