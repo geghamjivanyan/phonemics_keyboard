@@ -1,15 +1,11 @@
 import { useState } from "react";
 
-import {
-  DOT_TRANSFORMATIONS,
-  SPACE_TRANSFORMATIONS,
-  KEYBOARD_1,
-  KEYBOARD_2,
-} from "../../util";
+import { DOT_TRANSFORMATIONS, KEYBOARD_1, KEYBOARD_2 } from "../../util";
 import { KeyboardActions, KeyboardKey } from "../../interface";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
+import { applyTransformations } from "../../util/new-transformation";
 
 const SPACE_BETWEEN_ROW = 90;
 
@@ -47,16 +43,6 @@ export const PhonemicKeyboard = () => {
 
   const deleteLastCharacter = (): void => {
     setTypedText((prev: string) => prev.slice(0, -1));
-  };
-
-  const applyTransformations = (text: string): string => {
-    let transformed = text;
-    SPACE_TRANSFORMATIONS.slice()
-      .reverse()
-      .forEach(({ pattern, replace }: { pattern: RegExp; replace: string }) => {
-        transformed = transformed.replace(pattern, replace);
-      });
-    return transformed;
   };
 
   function handleKeyClick(key: KeyboardKey): void {

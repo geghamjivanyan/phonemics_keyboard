@@ -161,6 +161,14 @@ export const NEW_TRANSFORMATIONS: Array<{
 ];
 
 // Helper function for safe regex creation
-function escapeRegex(str: string) {
+export function escapeRegex(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export function applyTransformations(text: string): string {
+  let transformed = text;
+  NEW_TRANSFORMATIONS.forEach(({ pattern, replace }) => {
+    transformed = transformed.replace(pattern, replace);
+  });
+  return transformed;
 }
