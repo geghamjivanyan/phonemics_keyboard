@@ -1,4 +1,4 @@
-// Character transformations (immediate)
+// Explicit Pattern Approach
 export const CHAR_TRANSFORMATIONS: Array<{
   pattern: RegExp;
   replace: string;
@@ -95,10 +95,6 @@ export const CHAR_TRANSFORMATIONS: Array<{
   { pattern: /(لِ)ءُ$/u, replace: "$1أُ" },
   { pattern: /(لِ)ءِ$/u, replace: "$1إِ" },
 
-  { pattern: /(وَكَال)ءَ$/u, replace: "$1أَ" },
-  { pattern: /(وَكَال)ءُ$/u, replace: "$1أُ" },
-  { pattern: /(وَكَال)ءِ$/u, replace: "$1إِ" },
-
   { pattern: /(ال)ءَ$/u, replace: "$1أَ" },
   { pattern: /(ال)ءُ$/u, replace: "$1أُ" },
   { pattern: /(ال)ءِ$/u, replace: "$1إِ" },
@@ -127,11 +123,20 @@ export const CHAR_TRANSFORMATIONS: Array<{
 // Space-triggered transformations (same patterns but with space)
 export const SPACE_TRANSFORMATIONS = [
   ...CHAR_TRANSFORMATIONS.map(({ pattern, replace }) => ({
+    // Remove the end-of-string anchor and require a trailing space.
     pattern: new RegExp(pattern.source.replace(/\$$/u, " $"), "u"),
-    replace: replace.replace(/\$1/g, "$1 "),
+    replace: replace.replace(/\$1/g, "$1 "), // Append a space as needed.
   })),
-
-  // Additional space-specific rules
+  // Additional space-specific rules if needed.
   { pattern: / \.$/u, replace: "،" },
   { pattern: /، ،$/u, replace: "." },
 ];
+
+// Helper: Combined transformation function that applies all space-based rules.
+export function applyTransformations(text: string): string {
+  let transformed = text;
+  SPACE_TRANSFORMATIONS.forEach(({ pattern, replace }) => {
+    transformed = transformed.replace(pattern, replace);
+  });
+  return transformed;
+}
