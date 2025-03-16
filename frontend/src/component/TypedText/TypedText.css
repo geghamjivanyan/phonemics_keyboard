@@ -1,38 +1,104 @@
 .typed-text-wrapper {
+    position: relative;
     width: 25%;
+    margin: 0 auto;
+}
 
+.typed-text {
+    min-height: 50px;
+    font-size: 2.5em;
+    margin: 30px 0;
+    text-align: center;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    white-space: pre-wrap;
+}
+
+.typed-text-wrapper.has-rhythms .typed-text {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #ef9a9a;
+}
+
+.suggestions-container {
+    position: absolute;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: white;
+    border: 1px solid #eee;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.suggestions-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.suggestion-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.suggestion-item:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.suggestion-item:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* Loading indicator */
+.loading-indicator {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    color: #999;
+    display: flex;
+    gap: 4px;
+}
+
+@keyframes blink {
+    50% { opacity: 0.4; }
+}
+
+.loading-indicator span {
+    animation: blink 1s infinite;
+}
+
+.loading-indicator span:nth-child(1) { animation-delay: 0s; }
+.loading-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.loading-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@media (max-width: 768px) {
     .typed-text {
-        font-size: 2.5em;
-        margin: 30px 0;
-        text-align: center;
-        font-weight: bold;
-        padding: 15px 30px;
-        border-radius: 12px;
-        border: 1px solid #000;
-        background: #fff;
-        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-
-        white-space: pre-wrap;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        max-width: 100%;
+        font-size: 1.8em;
+        padding: 12px 20px;
     }
 
-    .recommendations-container {
-        ul {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-
-            .recommendation-tag {
-                cursor: pointer;
-                color: #fff;
-                background-color: #009688;
-                display: inline-block;
-                padding: 4px 12px;
-                text-align: center;
-                border-radius: 8px;
-            }
-        }
+    .suggestions-container {
+        max-width: 90%;
     }
 }
