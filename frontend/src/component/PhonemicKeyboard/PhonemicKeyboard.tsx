@@ -1,17 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+import { useDebounce } from "../../hook";
 import { DOT_TRANSFORMATIONS, KEYBOARD_1, KEYBOARD_2 } from "../../util";
+import { applyTransformations } from "../../util/new-transformation";
 import { KeyboardActions, KeyboardKey } from "../../interface";
+
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
-import { applyTransformations } from "../../util/new-transformation";
+
+export interface SearchResponse {
+  rhythms: string[];
+  suggestions: string[];
+}
 
 const SPACE_BETWEEN_ROW = 90;
 
 export const PhonemicKeyboard = () => {
   const [typedText, setTypedText] = useState("");
   const [activeKeyboard, setActiveKeyboard] = useState(KEYBOARD_1);
+
+  const [rhythms, setRhythms] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedText = useDebounce(typedText);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchSuggestions(controller.signal);
+    return () => controller.abort();
+  }, [debouncedText]);
+
+  const fetchSuggestions = async (signal: AbortSignal): Promise<void> => {
+    if (debouncedText.trim() === "") {
+      setRhythms([]);
+      setSuggestions([]);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/search/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: debouncedText }),
+        signal,
+      });
+
+      const data: SearchResponse = await response.json();
+      setRhythms(data.rhythms || []);
+      setSuggestions(data.suggestions || []);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setTypedText(suggestion);
+  };
 
   const insertCharacter = (char: string): void => {
     setTypedText((prev) => {
@@ -93,7 +143,13 @@ export const PhonemicKeyboard = () => {
         ))}
       </div>
 
-      <TypedText typedText={typedText} />
+      <TypedText
+        typedText={typedText}
+        rhythms={rhythms}
+        suggestions={suggestions}
+        isLoading={isLoading}
+        onSuggestionSelect={handleSuggestionClick}
+      />
     </div>
   );
 };

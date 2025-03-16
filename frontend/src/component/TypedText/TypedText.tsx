@@ -1,27 +1,43 @@
-import { patternRecommendations } from "../../util";
+import React from "react";
 import "./TypedText.css";
 
-export const TypedText = ({ typedText }: { typedText: string }) => {
-  const normalizedTypedText = typedText.trim().toLocaleLowerCase();
+interface TypedTextProps {
+  typedText: string;
+  rhythms?: string[];
+  suggestions?: string[];
+  onSuggestionSelect?: (suggestion: string) => void;
+  isLoading?: boolean;
+}
 
-  const filteredRecommendations =
-    normalizedTypedText.length > 0
-      ? patternRecommendations.data.filter((item) => {
-          return item.name.toLocaleLowerCase().startsWith(normalizedTypedText);
-        })
-      : [];
+export const TypedText: React.FC<TypedTextProps> = ({
+  typedText,
+  suggestions = [],
+  rhythms = [],
+  onSuggestionSelect,
+  isLoading = false,
+}: TypedTextProps) => {
+  const hasRhythms = rhythms && rhythms.length > 0;
+  const hasSuggestions = suggestions && suggestions.length > 0;
 
   return (
-    <div className="typed-text-wrapper">
+    <div className={`typed-text-wrapper ${hasRhythms ? "has-rhythms" : ""}`}>
       <div className="typed-text" dir="rtl">
         {typedText}
+        {isLoading && <span className="loading-indicator">•••</span>}
       </div>
-      {filteredRecommendations.length > 0 && (
-        <div className="recommendations-container">
+
+      {hasSuggestions && (
+        <div className="suggestions-container">
           <ul>
-            {filteredRecommendations.map((recommendation, index) => (
-              <li className="recfixommendation-tag" key={index}>
-                {recommendation.name}
+            {suggestions.map((suggestion, index) => (
+              <li
+                className="suggestion-item"
+                key={index}
+                onClick={() =>
+                  onSuggestionSelect && onSuggestionSelect(suggestion)
+                }
+              >
+                {suggestion}
               </li>
             ))}
           </ul>
