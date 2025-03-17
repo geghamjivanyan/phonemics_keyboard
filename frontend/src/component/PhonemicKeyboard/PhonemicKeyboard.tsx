@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 
 import { useDebounce } from "../../hook";
-import { DOT_TRANSFORMATIONS, KEYBOARD_1, KEYBOARD_2 } from "../../util";
-import { applyTransformations } from "../../util/new-transformation";
+import {
+  DOT_TRANSFORMATIONS,
+  KEYBOARD_1,
+  KEYBOARD_2,
+  applyTransformations,
+} from "../../util";
 import { KeyboardActions, KeyboardKey } from "../../interface";
 
 import { HexKeyButton } from "../HexKeyButton";
