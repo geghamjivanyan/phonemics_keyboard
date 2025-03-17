@@ -6,15 +6,15 @@ import dot from "../../assets/dot-icon.png";
 import deleteLeft from "../../assets/delete-left.svg";
 import "./HexKeyButton.css";
 
-export const HexKeyButton = ({ keyData, onClick }) => {
-  const ICONS = {
-    [KeyboardActions.SPACE]: spacebar,
-    [KeyboardActions.ENTER]: enter,
-    [KeyboardActions.DELETE]: deleteLeft,
-    [KeyboardActions.SWITCH_KEYBOARD]: globe,
-    [KeyboardActions.DOT]: dot,
-  };
+const ICONS = {
+  [KeyboardActions.SPACE]: spacebar,
+  [KeyboardActions.ENTER]: enter,
+  [KeyboardActions.DELETE]: deleteLeft,
+  [KeyboardActions.SWITCH_KEYBOARD]: globe,
+  [KeyboardActions.DOT]: dot,
+};
 
+export const HexKeyButton = ({ keyData, onClick }) => {
   return (
     <button
       aria-label={`Key: ${keyData.arabic}`}

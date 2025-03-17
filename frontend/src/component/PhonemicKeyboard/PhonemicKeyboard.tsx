@@ -16,16 +16,16 @@ export interface SearchResponse {
   };
 }
 
-const SPACE_BETWEEN_ROW = 90;
+const SPACE_BETWEEN_ROW: number = 90;
 
 export const PhonemicKeyboard = () => {
-  const [typedText, setTypedText] = useState("");
-  const [activeKeyboard, setActiveKeyboard] = useState(KEYBOARD_1);
-
+  const [typedText, setTypedText] = useState<string>("");
+  const [activeKeyboard, setActiveKeyboard] =
+    useState<KeyboardKey[][]>(KEYBOARD_1);
   const [rhythms, setRhythms] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const debouncedText = useDebounce(typedText);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const debouncedText: string = useDebounce<string>(typedText);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -54,41 +54,40 @@ export const PhonemicKeyboard = () => {
       const data: SearchResponse = await response.json();
       setRhythms(data.data.rhythms || []);
       setSuggestions(data.data.suggestions || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching suggestions:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
+  const handleSuggestionClick = (suggestion: string): void => {
     setTypedText(suggestion);
   };
 
   const insertCharacter = (char: string): void => {
-    setTypedText((prev) => {
+    setTypedText((prev: string) => {
       if (prev.endsWith(".")) {
-        const transformed = DOT_TRANSFORMATIONS[char];
+        const transformed: string | undefined = DOT_TRANSFORMATIONS[char];
         if (transformed) {
           return prev.slice(0, -1) + transformed;
         }
       }
-
       return prev + char;
     });
   };
 
   const handleDotInput = (): void => {
-    setTypedText((prev) => {
-      const lastChar = prev.slice(-1);
-      const replacement = DOT_TRANSFORMATIONS[lastChar];
+    setTypedText((prev: string) => {
+      const lastChar: string = prev.slice(-1);
+      const replacement: string | undefined = DOT_TRANSFORMATIONS[lastChar];
       return replacement ? prev.slice(0, -1) + replacement : prev + ".";
     });
   };
 
   const handleSpaceInput = (): void => {
-    setTypedText((prev) => {
-      const newText = prev + " ";
+    setTypedText((prev: string) => {
+      const newText: string = prev + " ";
       return applyTransformations(newText);
     });
   };
@@ -97,30 +96,31 @@ export const PhonemicKeyboard = () => {
     setTypedText((prev: string) => prev.slice(0, -1));
   };
 
-  function handleKeyClick(key: KeyboardKey): void {
+  const handleKeyClick = (key: KeyboardKey): void => {
     switch (key.action) {
       case KeyboardActions.DELETE:
         deleteLastCharacter();
-        return;
+        break;
       case KeyboardActions.DOT:
         handleDotInput();
-        return;
+        break;
       case KeyboardActions.SPACE:
         handleSpaceInput();
-        return;
+        break;
       case KeyboardActions.ENTER:
         console.log("ENTER", typedText);
-        return;
+        break;
       case KeyboardActions.SWITCH_KEYBOARD:
         switchKeyboard();
-        return;
+        break;
       default:
         insertCharacter(key.arabic);
+        break;
     }
-  }
+  };
 
   const switchKeyboard = (): void => {
-    setActiveKeyboard((prev) =>
+    setActiveKeyboard((prev: KeyboardKey[][]) =>
       prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
     );
   };
@@ -128,7 +128,7 @@ export const PhonemicKeyboard = () => {
   return (
     <div className="keyboard-container">
       <div className="keyboard">
-        {activeKeyboard.map((row: Array<KeyboardKey>, rowIndex: number) => (
+        {activeKeyboard.map((row: KeyboardKey[], rowIndex: number) => (
           <div
             className="keyboard-row"
             key={rowIndex}
