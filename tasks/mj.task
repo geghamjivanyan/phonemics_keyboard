@@ -2,9 +2,9 @@
  2- also remove * from translit_koran
  3- if the last letter in Koran Arabic text is a diacritis (u+0650 or u+064F or u+064E) remove it
  4- if we have cvvc at the very end, it becomes cvv c (separating them)
- 
- 1- when we type a letter then (.), we get the next letter, then the next, then the first letter. So it loops thgrough the letters and it does not appear as a single dot at the end of he letter. So the letter group created with dots (ح خ ج چ) when we add a dot to the last letter in the group, we get the first letter again. 
- 
+
+ 1- when we type a letter then (.), we get the next letter, then the next, then the first letter. So it loops thgrough the letters and it does not appear as a single dot at the end of he letter. So the letter group created with dots (ح خ ج چ) when we add a dot to the last letter in the group, we get the first letter again.
+
  2- the following groups will appear in unified colors:
   - wrqpjihc  in yellow
   - tonmg    in purple
@@ -12,17 +12,17 @@
   - vu    in green
   - asx    in white
   - bl    in black
-  
+
 3- the following letters followed by (.):
-  - U+0641 + (.) = U+0642 
-  - U+0629 + (.) = U+062B 
-  - U+0635 + (.) = U+0636 
-  - U+0639 + (.) = U+063A 
-  - U+0642 + (.) = U+06A4 
-  - U+0643 + (.) = U+06AF 
-  - U+0632 + (.) = U+0698 
-  - U+062C + (.) = U+0686 
-  - U+0634 + (.) = U+0686 
+  - U+0641 + (.) = U+0642
+  - U+0629 + (.) = U+062B
+  - U+0635 + (.) = U+0636
+  - U+0639 + (.) = U+063A
+  - U+0642 + (.) = U+06A4
+  - U+0643 + (.) = U+06AF
+  - U+0632 + (.) = U+0698
+  - U+062C + (.) = U+0686
+  - U+0634 + (.) = U+0686
   there is an element of TIME in the keyboard, this time is silence:
   space + space = comma (a comma is 400 ms silence)
   comma + space = period (a period is 800 ms silence)
