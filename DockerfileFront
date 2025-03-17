@@ -3,4 +3,10 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
+# Set environment variables for hot reloading
+ENV CHOKIDAR_USEPOLLING=true
+ENV WDS_SOCKET_PORT=0
+# Expose port
+EXPOSE 3000
+# Start the application
 CMD ["npm", "start"]

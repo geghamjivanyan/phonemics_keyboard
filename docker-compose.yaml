@@ -48,15 +48,20 @@ services:
   frontend:
     image: frontend:latest
     build:
-      dockerfile: DockerfileFront
       context: .
+      dockerfile: DockerfileFront
     volumes:
-      - .:/workspace
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - NODE_ENV=development
     ports:
       - "3000:3000"
     networks:
-      pgnet:
+      - pgnet
 
 
 volumes:

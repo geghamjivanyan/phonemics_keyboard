@@ -10,8 +10,10 @@ import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
 
 export interface SearchResponse {
-  rhythms: string[];
-  suggestions: string[];
+  data: {
+    rhythms: string[];
+    suggestions: string[];
+  };
 }
 
 const SPACE_BETWEEN_ROW = 90;
@@ -50,8 +52,8 @@ export const PhonemicKeyboard = () => {
       });
 
       const data: SearchResponse = await response.json();
-      setRhythms(data.rhythms || []);
-      setSuggestions(data.suggestions || []);
+      setRhythms(data.data.rhythms || []);
+      setSuggestions(data.data.suggestions || []);
     } catch (error) {
       console.error("Error fetching suggestions:", error);
     } finally {
