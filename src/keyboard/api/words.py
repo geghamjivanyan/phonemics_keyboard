@@ -56,6 +56,8 @@ class WordView(View):
         words = 'رَبِّ'
         words = words.split(' ')
         data = []
+
+        text = json.loads(request.body)
         if len(words) == 1:
             result = Word.objects.filter(prev=words[0])
             for r in result:
@@ -69,6 +71,14 @@ class WordView(View):
                 result = Word.objects.filter(prev=words[1])
                 for r in result:
                     data.append(r.current)
+
+        print("AAAAAAAAAAAAAAAA", text)
+
+        data = {
+            "rhythms": [],
+            "suggestions": ['aaaaa', 'bbbb']
+
+        }
 
         return HttpResponse(
             json.dumps({"data": data}),
