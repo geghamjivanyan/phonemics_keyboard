@@ -90,10 +90,7 @@ export const PhonemicKeyboard = () => {
   };
 
   const handleSpaceInput = (): void => {
-    setTypedText((prev: string) => {
-      const newText: string = prev + " ";
-      return applyTransformations(newText);
-    });
+    console.log("Space Clicked!");
   };
 
   const deleteLastCharacter = (): void => {
