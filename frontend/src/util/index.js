@@ -1,4 +1,8 @@
 export {
+  ArabicPhonemicTransformer,
+  ARABIC_ORTHOGRAPHIC_RULES,
+} from "./transformation/transformation";
+export {
   applyTransformations,
   NEW_TRANSFORMATIONS,
 } from "./transformation/new-transformation";

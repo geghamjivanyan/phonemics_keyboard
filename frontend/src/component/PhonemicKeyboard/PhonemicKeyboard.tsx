@@ -5,7 +5,7 @@ import {
   DOT_TRANSFORMATIONS,
   KEYBOARD_1,
   KEYBOARD_2,
-  applyTransformations,
+  ArabicPhonemicTransformer,
 } from "../../util";
 import { KeyboardActions, KeyboardKey } from "../../interface";
 
@@ -30,6 +30,7 @@ export const PhonemicKeyboard = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const debouncedText: string = useDebounce<string>(typedText);
+  const transformedText = ArabicPhonemicTransformer(typedText);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -44,6 +45,7 @@ export const PhonemicKeyboard = () => {
       return;
     }
 
+    const transformed = ArabicPhonemicTransformer(debouncedText);
     setIsLoading(true);
     try {
       const response = await fetch("http://localhost:8000/search/", {
@@ -51,7 +53,7 @@ export const PhonemicKeyboard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: debouncedText }),
+        body: JSON.stringify({ text: transformed }),
         signal,
       });
 
@@ -147,7 +149,7 @@ export const PhonemicKeyboard = () => {
       </div>
 
       <TypedText
-        typedText={typedText}
+        typedText={transformedText}
         rhythms={rhythms}
         suggestions={suggestions}
         isLoading={isLoading}
