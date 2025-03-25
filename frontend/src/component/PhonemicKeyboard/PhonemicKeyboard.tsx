@@ -85,9 +85,14 @@ export const PhonemicKeyboard = () => {
 
   const handleDotInput = (): void => {
     setTypedText((prev: string) => {
-      const lastChar: string = prev.slice(-1);
-      const replacement: string | undefined = DOT_TRANSFORMATIONS[lastChar];
-      return replacement ? prev.slice(0, -1) + replacement : prev + ".";
+      const lastThree = prev.slice(-3);
+      if (lastThree === "...") {
+        return prev.slice(0, -3) + ".";
+      } else {
+        const lastChar = prev.slice(-1);
+        const replacement = DOT_TRANSFORMATIONS[lastChar];
+        return replacement ? prev.slice(0, -1) + replacement : prev + ".";
+      }
     });
   };
 
