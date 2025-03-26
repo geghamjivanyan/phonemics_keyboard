@@ -30,7 +30,11 @@ export const PhonemicKeyboard = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const debouncedText: string = useDebounce<string>(typedText);
-  const transformedText = ArabicPhonemicTransformer(typedText);
+
+  const transformedText = ArabicPhonemicTransformer(typedText).replace(
+    /_/g,
+    " ",
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -72,32 +76,15 @@ export const PhonemicKeyboard = () => {
   };
 
   const insertCharacter = (char: string): void => {
-    setTypedText((prev: string) => {
-      if (prev.endsWith(".")) {
-        const transformed: string | undefined = DOT_TRANSFORMATIONS[char];
-        if (transformed) {
-          return prev.slice(0, -1) + transformed;
-        }
-      }
-      return prev + char;
-    });
+    setTypedText((prev: string) => prev + char);
   };
 
   const handleDotInput = (): void => {
     setTypedText((prev: string) => {
-      const lastThree = prev.slice(-3);
-      if (lastThree === "...") {
-        return prev.slice(0, -3) + ".";
-      } else {
-        const lastChar = prev.slice(-1);
-        const replacement = DOT_TRANSFORMATIONS[lastChar];
-        return replacement ? prev.slice(0, -1) + replacement : prev + ".";
-      }
+      const lastChar = prev.slice(-1);
+      const replacement = DOT_TRANSFORMATIONS[lastChar];
+      return replacement ? prev.slice(0, -1) + replacement : prev + ".";
     });
-  };
-
-  const handleSpaceInput = (): void => {
-    console.log("Space Clicked!");
   };
 
   const deleteLastCharacter = (): void => {
@@ -113,7 +100,7 @@ export const PhonemicKeyboard = () => {
         handleDotInput();
         break;
       case KeyboardActions.SPACE:
-        handleSpaceInput();
+        insertCharacter(key.arabic);
         break;
       case KeyboardActions.ENTER:
         console.log("ENTER", typedText);

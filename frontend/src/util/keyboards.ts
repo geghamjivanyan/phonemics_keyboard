@@ -12,7 +12,7 @@ export const KEYBOARD_1: Array<Array<KeyboardKey>> = [
     {
       id: 1,
       english: "a",
-      arabic: " ",
+      arabic: "_",
       color: VIOLET,
       action: KeyboardActions.SPACE,
     },
@@ -77,7 +77,7 @@ export const KEYBOARD_2: Array<Array<KeyboardKey>> = [
     {
       id: 1,
       english: "a",
-      arabic: " ",
+      arabic: "_",
       color: VIOLET,
       action: KeyboardActions.SPACE,
     },
