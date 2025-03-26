@@ -52,41 +52,6 @@ class WordView(View):
         )
 
     @staticmethod
-    def search(request):
-        words = 'رَبِّ'
-        words = words.split(' ')
-        data = []
-
-        text = json.loads(request.body)
-        if len(words) == 1:
-            result = Word.objects.filter(prev=words[0])
-            for r in result:
-                data.append(r.current)
-        if len(words) == 2:
-            result = Word.objects.filter(prev=words[0], current=words[1])
-            if len(result):
-                for r in result:
-                    data.append(r.next)
-            else:
-                result = Word.objects.filter(prev=words[1])
-                for r in result:
-                    data.append(r.current)
-
-        print("AAAAAAAAAAAAAAAA", text)
-
-        data = {
-            "rhythms": [],
-            "suggestions": ['aaaaa', 'bbbb']
-
-        }
-
-        return HttpResponse(
-            json.dumps({"data": data}),
-            status=200,
-            content_type="application/json; charset=utf-8",
-        )
-
-    @staticmethod
     def easy_shrift(request):
 
         words = Word.objects.all()
@@ -201,19 +166,77 @@ class WordView(View):
         for obj in objs:
             obj.delete()
 
-    """
-    062E + . = 062C   (خ ج)
-    066E + . = 0628   (ب)
-    0628 + . = 062A  (ب ت)
-    0646 + . = 062A  (ن  ت)
-    0647 + . = 0629   (ه  ة)
-    064E + . = 064B   (فتح   )
-    064F + . = 064C  (ضم   )
-    0650 + . = 064D  (كسر   )
-    0631 + . = 0632   (ر  ز)
-    062F + . = 0630   (د ذ)
-    062A + . = 062B   (ت ث)
-    0637 + . = 0638   (ط ظ)
-    0633 + . = 0634   (س ش
-    0635
-    """
+    @staticmethod
+    def search(request):
+        words = json.loads(request.body).get('text', None)
+
+        if words[-1] == ' ':
+            words = words.split(' ')
+            data = []
+
+            if len(words) == 1:
+                result = Word.objects.filter(prev=words[0])
+                for r in result:
+                    data.append(r.current)
+            if len(words) == 2:
+                result = Word.objects.filter(prev=words[0], current=words[1])
+                if len(result):
+                    for r in result:
+                        data.append(r.next)
+                else:
+                    result = Word.objects.filter(prev=words[1])
+                    for r in result:
+                        data.append(r.current)
+
+        data = {
+            "rhythms": [],
+            "suggestions": data,
+        }
+
+        return HttpResponse(
+            json.dumps({"data": data}),
+            status=200,
+            content_type="application/json; charset=utf-8",
+        )
+
+    @staticmethod
+    def _from_arabic_to_translit(text):
+
+        translate = {
+            'aa': chr(0x064E) + chr(0x0627),
+            'AA': chr(0x064E) + chr(0x0627),
+            'ii': chr(0x0650) + chr(0x064A),
+            'uu': chr(0x064F) + chr(0x0648),
+            'A':  chr(0x064E),
+            'a':  chr(0x064E),
+            'i':  chr(0x0650),
+            'u':  chr(0x064F),
+            'ʼ':  chr(0x0621),
+            'ʻ':  chr(0x0639),
+            'b':  chr(0x0628),
+            't':  chr(0x062A),
+            'd':  chr(0x062F),
+            'ǧ':  chr(0x062C),
+            'r':  chr(0x0631),
+            'ṯ':  chr(0x062B),
+            'z':  chr(0x0632),
+            's':  chr(0x0633),
+            'ḥ':  chr(0x062D),
+            'ḫ':  chr(0x062E),
+            'ḏ':  chr(0x0630),
+            'ṣ':  chr(0x0635),
+            'š':  chr(0x0634),
+            'ḍ':  chr(0x0636),
+            'ẓ':  chr(0x0638),
+            'ṭ':  chr(0x0637),
+            'ġ':  chr(0x063A),
+            'f':  chr(0x0641),
+            'q':  chr(0x0642),
+            'k':  chr(0x0643),
+            'l':  chr(0x0644),
+            'm':  chr(0x0645),
+            'n':  chr(0x0646),
+            'h':  chr(0x0647),
+            'w':  chr(0x0648),
+            'y':  chr(0x064A),
+        }
