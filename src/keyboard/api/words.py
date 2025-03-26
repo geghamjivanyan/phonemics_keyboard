@@ -181,7 +181,7 @@ class WordView(View):
     @staticmethod
     def search(request):
         words = json.loads(request.body).get('text', None)
-
+        words = words.replace('_', ' ')
         if words[-1] == ' ':
             words = words.split(' ')
             data = []
@@ -262,6 +262,7 @@ class WordView(View):
             'h':  chr(0x0647),
             'w':  chr(0x0648),
             'y':  chr(0x064A),
+            ' ': ' ',
         }
 
         s = ''
@@ -319,6 +320,7 @@ class WordView(View):
             chr(0x0647): 'h',
             chr(0x0648): 'w',
             chr(0x064A): 'y',
+            ' ': ' ',
         }
 
         s = ''
