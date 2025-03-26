@@ -1,4 +1,6 @@
 // Dynamic Regex Approach
+import { escapeRegex } from "../escape-regex";
+
 export const NEW_TRANSFORMATIONS: Array<{
   pattern: RegExp;
   replace: string;
@@ -159,11 +161,6 @@ export const NEW_TRANSFORMATIONS: Array<{
     },
   ]),
 ];
-
-// Helper function for safe regex creation
-export function escapeRegex(str: string) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 
 export function applyTransformations(text: string): string {
   let transformed = text;
