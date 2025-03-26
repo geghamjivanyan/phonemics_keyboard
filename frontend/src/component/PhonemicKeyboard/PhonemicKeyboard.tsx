@@ -31,10 +31,7 @@ export const PhonemicKeyboard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const debouncedText: string = useDebounce<string>(typedText);
 
-  const transformedText = ArabicPhonemicTransformer(typedText).replace(
-    /_/g,
-    " ",
-  );
+  const transformedText = ArabicPhonemicTransformer(typedText);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -72,7 +69,7 @@ export const PhonemicKeyboard = () => {
   };
 
   const handleSuggestionClick = (suggestion: string): void => {
-    setTypedText(suggestion);
+    setTypedText((prev: string) => prev + suggestion);
   };
 
   const insertCharacter = (char: string): void => {
