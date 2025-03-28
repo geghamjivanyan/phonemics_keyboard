@@ -14,6 +14,14 @@ export const DOT_TRANSFORMATIONS: Record<string, string> = {
   // ه -> ة -> ه -> ة -> ه (2-dot pattern extended)
   "\u0647": "\u0629", // ه -> ة (odd dots)
   "\u0629": "\u0647", // ة -> ه (even dots)
+  
+  // ه -> ة -> ه -> ة -> ه (2-dot pattern extended)
+  "\u0635": "\u0636", // ص -> ض (odd dots)
+  "\u0636": "\u0635", // ض -> ص (even dots)
+  
+  // ه -> ة -> ه -> ة -> ه (2-dot pattern extended)
+  "\u0639": "\u063A", // ع -> غ (odd dots)
+  "\u063A": "\u0639", // غ -> ع (even dots)
 
    // ن -> ت -> ن -> ت -> ن (1-dot pattern extended)
   "\u0646": "\u062A", // ن -> ت (odd dots)
