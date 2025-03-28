@@ -1,21 +1,15 @@
 export const DOT_TRANSFORMATIONS: Record<string, string> = {
-  // ح -> خ -> ج -> ي -> ح (4 dots cycle)
+  // ح -> خ -> ج -> ح (3 dots cycle)
   "\u062D": "\u062E", // ح -> خ (1st dot)
   "\u062E": "\u062C", // خ -> ج (2nd dot)
-  "\u062C": "\u064A", // ج -> ي (3rd dot)
-  "\u064A": "\u062D", // ي -> ح (4th dot)
+  "\u062C": "\u062D", // ج -> ح (3rd dot)
+  
 
   // ب (dotless) -> ب -> ت -> ث -> ب (dotless)
   "\u066E": "\u0628", // ٮ -> ب (1st dot)
   "\u0628": "\u062A", // ب -> ت (2nd dot)
   "\u062A": "\u062B", // ت -> ث (3rd dot)
   "\u062B": "\u066E", // ث -> ٮ (4th dot)
-
-  // ن -> م -> ك -> ل -> ن (new unique cycle)
-  "\u0646": "\u0645", // ن -> م (1st dot)
-  "\u0645": "\u0643", // م -> ك (2nd dot)
-  "\u0643": "\u0644", // ك -> ل (3rd dot)
-  "\u0644": "\u0646", // ل -> ن (4th dot)
 
   // ه -> ة -> ه -> ة -> ه (2-dot pattern extended)
   "\u0647": "\u0629", // ه -> ة (odd dots)
