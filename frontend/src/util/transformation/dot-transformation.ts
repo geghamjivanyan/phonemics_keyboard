@@ -15,6 +15,21 @@ export const DOT_TRANSFORMATIONS: Record<string, string> = {
   "\u0647": "\u0629", // ه -> ة (odd dots)
   "\u0629": "\u0647", // ة -> ه (even dots)
 
+   // ن -> ت -> ن -> ت -> ن (1-dot pattern extended)
+  "\u0646": "\u062A", // ن -> ت (odd dots)
+
+   //  ي -> ل -> م -> ك (1-dot no change pattern)
+  "\u064A": "\u064A", // ي -> ي (odd dots)
+  "\u0644": "\u0644", // ل -> ل (odd dots)
+  "\u0645": "\u0645", // م -> م (odd dots)
+  "\u0643": "\u0643", // ك -> ك (odd dots)
+  "\u0648": "\u0648", // و -> و (odd dots)
+  "\u0641": "\u0642", // ف -> ق (odd dots)
+  "\u0642": "\u0641", // ق -> ف (odd dots)
+  "\u0627": "\u0627", // ا -> ا (odd dots)
+  "\u0621": "\u0621", // ء -> ء (odd dots)
+
+
   // ر -> ز -> ر -> ز -> ر (2-dot pattern)
   "\u0631": "\u0632", // ر -> ز (odd dots)
   "\u0632": "\u0631", // ز -> ر (even dots)
