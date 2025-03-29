@@ -2,6 +2,9 @@ import { escapeRegex } from "../escape-regex";
 
 export const ARABIC_ORTHOGRAPHIC_RULES = [
   // Diacritic transformations
+  { pattern: new RegExp(" ً", "u"), replace: " أَن" },
+  { pattern: new RegExp(" ٌ", "u"), replace: " أُن" },
+  { pattern: new RegExp(" ٍ", "u"), replace:  " إِن" },
   
   { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
   { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
@@ -38,6 +41,14 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ُوِ", "u"), replace: "ُوِ" },
   { pattern: new RegExp("َِ", "u"), replace: "يَ" },
   { pattern: new RegExp("ُِ", "u"), replace: "يُ" },
+
+  { pattern: new RegExp("ؤِ", "u"), replace: "ئِ" },
+  { pattern: new RegExp("اءََ", "u"), replace: "اءَا" },
+  { pattern: new RegExp("يء", "u"), replace: "ئ" },
+  { pattern: new RegExp("وءََ", "u"), replace: "وءَا" },
+  { pattern: new RegExp("اءُ ", "u"), replace: "اءُ " },
+  { pattern: new RegExp("اءِ ", "u"), replace: "اءِ " },
+
 
 
 
@@ -150,6 +161,24 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ً", "u"), replace: "ًـ" },
   { pattern: new RegExp("ٍ", "u"), replace: "ٍـ" },
   { pattern: new RegExp("ٌ", "u"), replace: "ٌـ" },
+
+  { pattern: new RegExp("  ", "u"), replace: ", " },
+  { pattern: new RegExp(",,", "u"), replace: ". " },
+  
+  { pattern: new RegExp("اللَاه", "u"), replace: "اللّه" },
+  { pattern: new RegExp("هَاأَنتُم", "u"), replace: "هَأَنتُم" },
+  { pattern: new RegExp("هَاأَنَا", "u"), replace: "هَأَنَا" },
+  { pattern: new RegExp("هَاذِهِ", "u"), replace: "هَذِهِ" },
+  { pattern: new RegExp("هَاؤُلَاء", "u"), replace: "هَؤُلَاء" },
+  { pattern: new RegExp("ذَالِك", "u"), replace: "ذَلِك" },
+   { pattern: new RegExp("هَاذَا", "u"), replace: "هَذَا" },
+  { pattern: new RegExp("لَاكِن", "u"), replace: "لَكِن" },
+  { pattern: new RegExp("إِلَاه", "u"), replace: "إِلَه" },
+  { pattern: new RegExp("الرَّحمَان", "u"), replace: "الرَّحمَن" }, 
+  { pattern: new RegExp("أُلِي", "u"), replace: "أُولِي" },
+  { pattern: new RegExp("أُلُو", "u"), replace: "أُولُو" },
+  { pattern: new RegExp("أُلَائِك", "u"), replace: "أُولَئِك" },
+  { pattern: new RegExp("عَمرُ", "u"), replace: "عَمرو" },
 ];
 
 export function ArabicPhonemicTransformer(text: string): string {
