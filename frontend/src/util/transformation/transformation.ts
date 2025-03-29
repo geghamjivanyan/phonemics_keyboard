@@ -6,6 +6,45 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ً", "u"), replace: "ًـ" },
   { pattern: new RegExp("ٍ", "u"), replace: "ٍـ" },
   { pattern: new RegExp("ٌ", "u"), replace: "ٌـ" },
+  
+  { pattern: new RegExp("َِ", "u"), replace: "ِا" },
+  { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
+  { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
+  { pattern: new RegExp(" ءِ", "u"), replace: " إِ" },
+  { pattern: new RegExp("أََ", "u"), replace: "آ" },
+  
+  { pattern: new RegExp("الءَ", "u"), replace: "الأَ" },
+  { pattern: new RegExp("الءُ", "u"), replace: "الأُ" },
+  { pattern: new RegExp("يِ", "u"), replace: "يّ" },
+  { pattern: new RegExp("يِّ", "u"), replace: "يِّ" },
+  { pattern: new RegExp("يِِّ", "u"), replace: "يِّي" },
+  { pattern: new RegExp("وُ", "u"), replace: "وّ" },
+  { pattern: new RegExp("وُّ", "u"), replace: "وُّو" },
+  { pattern: new RegExp(" الُ", "u"), replace: " الو" },
+  { pattern: new RegExp(" الِ", "u"), replace: " الي" },
+  { pattern: new RegExp(" الل", "u"), replace: " الل" },
+  { pattern: new RegExp("ََ", "u"), replace: "َا" },
+  { pattern: new RegExp(" ُُ", "u"), replace: " ُو" },
+  { pattern: new RegExp(" ِِ", "u"), replace: " ِي" },
+  { pattern: new RegExp("َُ", "u"), replace: "َو" },
+  { pattern: new RegExp("َِ", "u"), replace: "َي" },
+  { pattern: new RegExp("َُ", "u"), replace: "وَ" },
+  { pattern: new RegExp("ُِ", "u"), replace: "وِ" },
+  { pattern: new RegExp("ُُِ", "u"), replace: "ُيُ" },
+  { pattern: new RegExp("َِ", "u"), replace: "يَ" },
+  { pattern: new RegExp("ُِ", "u"), replace: "يُ" },
+  { pattern: new RegExp("ُِِ", "u"), replace: "ِوِ" },
+  { pattern: new RegExp("اُ", "u"), replace: "ٌـ" },
+  { pattern: new RegExp("ٌ", "u"), replace: "او" },
+  { pattern: new RegExp("اِ", "u"), replace: "اي" },
+  { pattern: new RegExp("ِيَ", "u"), replace: "ِيَ" },
+  { pattern: new RegExp("ِيُ", "u"), replace: "ِيُ" },
+  { pattern: new RegExp("ُوَ", "u"), replace: "ُوَ" },
+  { pattern: new RegExp("ُوِ", "u"), replace: "ُوِ" },
+
+
+
+
 
   // Double consonant transformations (e.g., ـضض → ـالضّ)
   ...[
