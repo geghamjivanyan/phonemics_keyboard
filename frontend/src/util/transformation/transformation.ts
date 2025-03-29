@@ -150,6 +150,10 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ةًـ", "u"), replace: "ةًـ" },
   { pattern: new RegExp("اًـ", "u"), replace: "اًـ" },
   { pattern: new RegExp("ىًـ", "u"), replace: "ىًـ" },
+  { pattern: new RegExp("ـَ", "u"), replace: "ـا" },
+  { pattern: new RegExp("ً", "u"), replace: "ًـ" },
+  { pattern: new RegExp("ٍ", "u"), replace: "ٍـ" },
+  { pattern: new RegExp("ٌ", "u"), replace: "ٌـ" },
 ];
 
 export function ArabicPhonemicTransformer(text: string): string {
