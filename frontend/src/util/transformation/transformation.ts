@@ -7,7 +7,6 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ٍ", "u"), replace: "ٍـ" },
   { pattern: new RegExp("ٌ", "u"), replace: "ٌـ" },
   
-  { pattern: new RegExp("َِ", "u"), replace: "ِا" },
   { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
   { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
   { pattern: new RegExp(" ءِ", "u"), replace: " إِ" },
