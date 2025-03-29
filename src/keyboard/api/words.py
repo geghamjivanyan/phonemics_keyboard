@@ -185,7 +185,6 @@ class WordView(View):
         print("WORD", words[-1])
         #words = words.replace('_', ' ')
         if words[-1] == "ـ":
-            print("AAAAAAAAAAA")
             words = words.split(' ')
             data = []
 
@@ -356,7 +355,7 @@ class WordView(View):
             else:
                 s += res[i]
                 i += 1
-        s += res[-1]
+        #s += res[-1]
         
         return s.strip()
     
