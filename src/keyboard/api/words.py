@@ -182,7 +182,7 @@ class WordView(View):
     @staticmethod
     def search(request):
         words = json.loads(request.body).get('text', None)
-        print("WORD", words[-1])
+        print("WORD", words)
         #words = words.replace('_', ' ')
         if words[-1] == "ـ":
             words = words.split(' ')
@@ -214,7 +214,7 @@ class WordView(View):
                 data = WordView.suggest(translits)
 
         data = {
-            "rhythms": [],
+            "rhythms": ['adcsc'],
             "suggestions": data,
         }
 
@@ -289,10 +289,9 @@ class WordView(View):
 
         translit = {
             chr(0x064E) + chr(0x0627): 'aa',
-            chr(0x064E) + chr(0x0627): 'AA',
+            #chr(0x064E) + chr(0x0627): 'AA',
             chr(0x0650) + chr(0x064A): 'ii',
             chr(0x064F) + chr(0x0648): 'uu',
-            chr(0x064E): 'A',
             chr(0x064E): 'a',
             chr(0x0650): 'i',
             chr(0x064F): 'u',
@@ -319,7 +318,7 @@ class WordView(View):
             chr(0x0642): 'q',
             chr(0x0643): 'k',
             chr(0x0644): 'l',
-            chr(0x0644): 'L',
+            #chr(0x0644): 'L',
             chr(0x0645): 'm',
             chr(0x0646): 'n',
             chr(0x0647): 'h',
@@ -327,19 +326,32 @@ class WordView(View):
             chr(0x064A): 'y',
             ' ': ' ',
         }
+        a_rules = 'Lrqṣṭġḍḍḫ'
+        l_rules = 'uaALLAAh'
 
         s = ''
         i = 0
         while i < len(text):
 
             if text[i:i+2] in translit:
-                s += translit[text[i:i+2]]
+                if i > 1 and translit[text[i-1]] in a_rules and \
+                        text[i] == chr(0x064E):
+                        s += 'AA'
+                else:
+                    s += translit[text[i:i+2]]
                 i += 2
             else:
                 try:
-                    s += translit[text[i]]
-                except KeyError:
-                    pass
+                    if i > 0 and translit[text[i-1]] in a_rules and \
+                        text[i] == chr(0x064E):
+                        s += 'A'
+                    elif i > 0 and translit[text[i-1]] in l_rules and \
+                        text[i] == chr(0x0644):
+                        s += 'L'
+                    else:
+                        s += translit[text[i]]
+                except KeyError as err:
+                    print("KeyError", err)
                 i += 1
 
         return s 
@@ -355,7 +367,8 @@ class WordView(View):
             else:
                 s += res[i]
                 i += 1
-        #s += res[-1]
+        if i < len(res):
+            s += res[-1]
         
         return s.strip()
     
@@ -363,19 +376,19 @@ class WordView(View):
     def suggest(cut):
 
         data = []
-        if len(cut) == 1:
-            suggestions = TranslitWord.objects.filter(prev=cut[0])
-            for suggest in suggestions:
-                if suggest.current:
-                    res = WordView._from_translit_to_arabic(suggest.current)
-                    data.append(res)
+        sort_data = []
         if len(cut) > 1:
             suggestions = TranslitWord.objects.filter(prev=cut[-2], current=cut[-1])
+            print("Suggestions 2")
             for suggest in suggestions:
                 if suggest.next:
+                    sort_data.append(suggest.next)
                     res = WordView._from_translit_to_arabic(suggest.next)
                     data.append(res)
 
+        s_data = WordView.sort_by_frequency(sort_data)
+        for d in s_data:
+            print(d)
         return WordView.sort_by_frequency(data)
     
     @staticmethod

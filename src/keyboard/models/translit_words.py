@@ -11,6 +11,9 @@ class TranslitWord(models.Model):
     next = models.CharField(max_length=5, null=True, blank=True)
     pattern = models.CharField(max_length=3, null=True, blank=True)
 
+    def __str__(self):
+        return "{} {} {}".format(self.prev, self.current, self.next)
+
 @admin.register(TranslitWord)
 class TranslitViewAdmin(admin.ModelAdmin):
     list_display = (
