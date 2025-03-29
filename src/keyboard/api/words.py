@@ -3,6 +3,7 @@ import json
 
 #
 from datetime import datetime
+from collections import Counter
 
 #
 from django.views.generic import View
@@ -181,8 +182,10 @@ class WordView(View):
     @staticmethod
     def search(request):
         words = json.loads(request.body).get('text', None)
-        words = words.replace('_', ' ')
-        if words[-1] == ' ':
+        print("WORD", words[-1])
+        #words = words.replace('_', ' ')
+        if words[-1] == "ـ":
+            print("AAAAAAAAAAA")
             words = words.split(' ')
             data = []
 
@@ -202,13 +205,14 @@ class WordView(View):
         else:
             print("TRANSLIT")
             arabic = WordView._from_arabic_to_translit(words)
-            print("ARABIC", arabic)
-            cut = WordView.split(arabic)
-            print("CUT", cut)
+            if arabic:
+                print("ARABIC", arabic)
+                cut = WordView.split(arabic)
+                print("CUT", cut)
 
-            translits = cut.split(' ')
-            print("TRANSLIT", translits)
-            data = WordView.suggest(translits)
+                translits = cut.split(' ')
+                print("TRANSLIT", translits)
+                data = WordView.suggest(translits)
 
         data = {
             "rhythms": [],
@@ -273,11 +277,13 @@ class WordView(View):
                 s += translit[text[i:i+2]]
                 i += 2
             else:
-                print("TEXT I", text[i])
-                s += translit[text[i]]
+                try:
+                    s += translit[text[i]]
+                except KeyError:
+                    pass
                 i += 1
 
-        return s 
+        return s
     
     @staticmethod
     def _from_arabic_to_translit(text):
@@ -331,7 +337,10 @@ class WordView(View):
                 s += translit[text[i:i+2]]
                 i += 2
             else:
-                s += translit[text[i]]
+                try:
+                    s += translit[text[i]]
+                except KeyError:
+                    pass
                 i += 1
 
         return s 
@@ -368,4 +377,9 @@ class WordView(View):
                     res = WordView._from_translit_to_arabic(suggest.next)
                     data.append(res)
 
-        return data
+        return WordView.sort_by_frequency(data)
+    
+    @staticmethod
+    def sort_by_frequency(lst):
+        freq = Counter(lst)
+        return sorted(set(lst), key=lambda x: freq[x], reverse=True)
