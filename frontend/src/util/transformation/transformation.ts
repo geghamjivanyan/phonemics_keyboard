@@ -2,10 +2,6 @@ import { escapeRegex } from "../escape-regex";
 
 export const ARABIC_ORTHOGRAPHIC_RULES = [
   // Diacritic transformations
-  { pattern: new RegExp("ـَ", "u"), replace: "ـا" },
-  { pattern: new RegExp("ً", "u"), replace: "ًـ" },
-  { pattern: new RegExp("ٍ", "u"), replace: "ٍـ" },
-  { pattern: new RegExp("ٌ", "u"), replace: "ٌـ" },
   
   { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
   { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
