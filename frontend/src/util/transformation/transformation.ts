@@ -41,6 +41,10 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ِيُ", "u"), replace: "ِيُ" },
   { pattern: new RegExp("ُوَ", "u"), replace: "ُوَ" },
   { pattern: new RegExp("ُوِ", "u"), replace: "ُوِ" },
+  { pattern: new RegExp("َِ", "u"), replace: "يَ" },
+  { pattern: new RegExp("ُِ", "u"), replace: "يُ" },
+
+
 
 
 
