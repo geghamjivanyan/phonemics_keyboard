@@ -3,7 +3,7 @@ import { escapeRegex } from "../escape-regex";
 export const ARABIC_ORTHOGRAPHIC_RULES = [
   // Diacritic transformations
 
-  { pattern: new RegExp(" ", "u"), replace: " " },
+  { pattern: new RegExp("ـ", "u"), replace: " " },
 
   
   { pattern: new RegExp(" ً", "u"), replace: " أَن" },
