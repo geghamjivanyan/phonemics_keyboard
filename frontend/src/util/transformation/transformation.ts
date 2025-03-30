@@ -2,6 +2,9 @@ import { escapeRegex } from "../escape-regex";
 
 export const ARABIC_ORTHOGRAPHIC_RULES = [
   // Diacritic transformations
+
+  { pattern: new RegExp("ـ", "u"), replace: " " },
+
   { pattern: new RegExp(" ً", "u"), replace: " أَن" },
   { pattern: new RegExp(" ٌ", "u"), replace: " أُن" },
   { pattern: new RegExp(" ٍ", "u"), replace:  " إِن" },
@@ -10,6 +13,12 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
   { pattern: new RegExp(" ءِ", "u"), replace: " إِ" },
   { pattern: new RegExp("أََ", "u"), replace: "آ" },
+
+  { pattern: new RegExp("ُُ", "u"), replace: "ُو" },
+  { pattern: new RegExp("ِِ", "u"), replace: "ِي" },
+
+  { pattern: new RegExp(" ُ", "u"), replace: " و" },
+  { pattern: new RegExp(" ِ", "u"), replace: " ي" },
   
   { pattern: new RegExp("الءَ", "u"), replace: "الأَ" },
   { pattern: new RegExp("الءُ", "u"), replace: "الأُ" },
@@ -32,7 +41,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("َِ", "u"), replace: "يَ" },
   { pattern: new RegExp("ُِ", "u"), replace: "يُ" },
   { pattern: new RegExp("ُِِ", "u"), replace: "ِوِ" },
-  { pattern: new RegExp("اُ", "u"), replace: "ٌـ" },
+  { pattern: new RegExp("اُ", "u"), replace: "ٌ " },
   { pattern: new RegExp("ٌ", "u"), replace: "او" },
   { pattern: new RegExp("اِ", "u"), replace: "اي" },
   { pattern: new RegExp("ِيَ", "u"), replace: "ِيَ" },
@@ -56,7 +65,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
 
 
 
-  // Double consonant transformations (e.g., ـضض → ـالضّ)
+  // Double consonant transformations (e.g.,  ضض →  الضّ)
   ...[
     "ض",
     "ص",
@@ -73,8 +82,8 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
     "ذ",
 
   ].map((letter) => ({
-    pattern: new RegExp(`ـ${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
-    replace: letter === "ل" ? `ـالل` : `ـال${letter}ّ`,
+    pattern: new RegExp(` ${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
+    replace: letter === "ل" ? ` الل` : ` ال${letter}ّ`,
   })),
   ...[
 
@@ -97,18 +106,18 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
     replace: `${letter}ّ`,
   })),
 
-  // Prefix transformations with ل (e.g., ـلق → ـالق)
+  // Prefix transformations with ل (e.g.,  لق →  الق)
   ...["ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "ي", "ب", "م", "ك", "ء", "و"].map(
     (letter) => ({
-      pattern: new RegExp(`ـل${escapeRegex(letter)}`, "u"),
-      replace: `ـال${letter}`,
+      pattern: new RegExp(` ل${escapeRegex(letter)}`, "u"),
+      replace: ` ال${letter}`,
     }),
   ),
 
   // Hamza transformations (reordered)
-  { pattern: new RegExp("ـءَ", "u"), replace: "ـأَ" },
-  { pattern: new RegExp("ـءِ", "u"), replace: "ـإ" },
-  { pattern: new RegExp("ـءُ", "u"), replace: "ـأُ" },
+  { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
+  { pattern: new RegExp(" ءِ", "u"), replace: " إ" },
+  { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
   { pattern: new RegExp("ِء", "u"), replace: "ِئ" },
   { pattern: new RegExp("ءِ", "u"), replace: "ئِ" },
   { pattern: new RegExp("ءُ", "u"), replace: "ؤُ" },
@@ -119,13 +128,13 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ءََ", "u"), replace: "آ" },
 
   // Complex prefix rules
-  { pattern: new RegExp("ـفَؤُ", "u"), replace: "ـفَأُ" },
-  { pattern: new RegExp("ـفَئِ", "u"), replace: "ـفَإِ" },
-  { pattern: new RegExp("ـكَؤُ", "u"), replace: "ـكَأُ" },
-  { pattern: new RegExp("ـكَئِ", "u"), replace: "ـكَإِ" },
+  { pattern: new RegExp(" فَؤُ", "u"), replace: " فَأُ" },
+  { pattern: new RegExp(" فَئِ", "u"), replace: " فَإِ" },
+  { pattern: new RegExp(" كَؤُ", "u"), replace: " كَأُ" },
+  { pattern: new RegExp(" كَئِ", "u"), replace: " كَإِ" },
   { pattern: new RegExp("كَإِيب", "u"), replace: "كَئيب" },
-  { pattern: new RegExp("ـوَكَؤُ", "u"), replace: "ـوَكَأُ" },
-  { pattern: new RegExp("ـوَكَئِ", "u"), replace: "ـوَكَإِ" },
+  { pattern: new RegExp(" وَكَؤُ", "u"), replace: " وَكَأُ" },
+  { pattern: new RegExp(" وَكَئِ", "u"), replace: " وَكَإِ" },
   { pattern: new RegExp("وَكَؤُ", "u"), replace: "وَكَأُ" },
   { pattern: new RegExp("وَكَئِ", "u"), replace: "وَكَإِ" },
   { pattern: new RegExp("فَكَالؤُ", "u"), replace: "فَكَالأُ" },
@@ -140,27 +149,27 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("عَبدَالءِ", "u"), replace: "عَبدَالإِ" },
   { pattern: new RegExp("عَبدَالءُ", "u"), replace: "عَبدَالأُ" },
 
-  // Trailing ـ rules
-  { pattern: new RegExp("حَتَّاـ", "u"), replace: "حَتَّى " },
-  { pattern: new RegExp("عَلاـ", "u"), replace: "عَلَى" },
-  { pattern: new RegExp("بَلاـ", "u"), replace: "بَلَى" },
-  { pattern: new RegExp("إلاـ", "u"), replace: "إِلَى " },
-  { pattern: new RegExp("مَتاـ", "u"), replace: "مَتَى" },
-  { pattern: new RegExp("عيساـ", "u"), replace: "عِيسَى " },
-  { pattern: new RegExp("موساـ", "u"), replace: "مُوسَى " },
-  { pattern: new RegExp("لَداـ", "u"), replace: " لَدَى " },
-  { pattern: new RegExp("أولاـ", "u"), replace: "أَولَى " },
-  { pattern: new RegExp("رَعاـ", "u"), replace: "رَعَى " },
-  { pattern: new RegExp("رَماـ", "u"), replace: "رَمَى " },
-  { pattern: new RegExp("اءًـ", "u"), replace: "وءا" },
-  { pattern: new RegExp("أًـ", "u"), replace: "أًـ" },
-  { pattern: new RegExp("ةًـ", "u"), replace: "ةًـ" },
-  { pattern: new RegExp("اًـ", "u"), replace: "اًـ" },
-  { pattern: new RegExp("ىًـ", "u"), replace: "ىًـ" },
-  { pattern: new RegExp("ـَ", "u"), replace: "ـا" },
-  { pattern: new RegExp("ً", "u"), replace: "ًـ" },
-  { pattern: new RegExp("ٍ", "u"), replace: "ٍـ" },
-  { pattern: new RegExp("ٌ", "u"), replace: "ٌـ" },
+  // Trailing   rules
+  { pattern: new RegExp("حَتَّا ", "u"), replace: "حَتَّى " },
+  { pattern: new RegExp("عَلا ", "u"), replace: "عَلَى" },
+  { pattern: new RegExp("بَلا ", "u"), replace: "بَلَى" },
+  { pattern: new RegExp("إلا ", "u"), replace: "إِلَى " },
+  { pattern: new RegExp("مَتا ", "u"), replace: "مَتَى" },
+  { pattern: new RegExp("عيسا ", "u"), replace: "عِيسَى " },
+  { pattern: new RegExp("موسا ", "u"), replace: "مُوسَى " },
+  { pattern: new RegExp("لَدا ", "u"), replace: " لَدَى " },
+  { pattern: new RegExp("أولا ", "u"), replace: "أَولَى " },
+  { pattern: new RegExp("رَعا ", "u"), replace: "رَعَى " },
+  { pattern: new RegExp("رَما ", "u"), replace: "رَمَى " },
+  { pattern: new RegExp("اءً ", "u"), replace: "وءا" },
+  { pattern: new RegExp("أً ", "u"), replace: "أً " },
+  { pattern: new RegExp("ةً ", "u"), replace: "ةً " },
+  { pattern: new RegExp("اً ", "u"), replace: "اً " },
+  { pattern: new RegExp("ىً ", "u"), replace: "ىً " },
+  { pattern: new RegExp(" َ", "u"), replace: " ا" },
+  { pattern: new RegExp("ً", "u"), replace: "ً " },
+  { pattern: new RegExp("ٍ", "u"), replace: "ٍ " },
+  { pattern: new RegExp("ٌ", "u"), replace: "ٌ " },
 
   { pattern: new RegExp("  ", "u"), replace: ", " },
   { pattern: new RegExp(",,", "u"), replace: ". " },
