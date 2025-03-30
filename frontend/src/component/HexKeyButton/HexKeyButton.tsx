@@ -1,4 +1,4 @@
-import { KeyboardActions } from "../../interface";
+import { KeyboardActions, KeyboardKey } from "../../interface";
 import spacebar from "../../assets/spacebar.svg";
 import enter from "../../assets/enter.svg";
 import globe from "../../assets/globe.png";
@@ -14,7 +14,13 @@ const ICONS = {
   [KeyboardActions.DOT]: dot,
 };
 
-export const HexKeyButton = ({ keyData, onClick }) => {
+export const HexKeyButton = ({
+  keyData,
+  onClick,
+}: {
+  keyData: KeyboardKey;
+  onClick: any;
+}) => {
   return (
     <button
       aria-label={`Key: ${keyData.arabic}`}
@@ -22,7 +28,7 @@ export const HexKeyButton = ({ keyData, onClick }) => {
       style={{ backgroundColor: keyData.color }}
       onClick={onClick}
     >
-      {ICONS[keyData.action] ? (
+      {keyData.action && ICONS[keyData.action] ? (
         <img
           src={ICONS[keyData.action]}
           alt="Key icon"

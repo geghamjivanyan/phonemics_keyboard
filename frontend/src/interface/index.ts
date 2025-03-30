@@ -16,3 +16,10 @@ export interface KeyboardKey {
   color: string;
   action?: KeyboardAction;
 }
+
+export interface SearchResponse {
+  data: {
+    rhythms: string[];
+    suggestions: string[];
+  };
+}

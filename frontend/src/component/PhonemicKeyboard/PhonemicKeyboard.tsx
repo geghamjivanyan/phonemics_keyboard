@@ -7,18 +7,13 @@ import {
   KEYBOARD_2,
   ArabicPhonemicTransformer,
 } from "../../util";
-import { KeyboardActions, KeyboardKey } from "../../interface";
+import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
+import logo1 from "../../assets/logo/logo_1.jpg";
+import logo2 from "../../assets/logo/logo_2.jpg";
 
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
-
-export interface SearchResponse {
-  data: {
-    rhythms: string[];
-    suggestions: string[];
-  };
-}
 
 const SPACE_BETWEEN_ROW: number = 90;
 
@@ -119,22 +114,29 @@ export const PhonemicKeyboard = () => {
 
   return (
     <div className="keyboard-container">
-      <div className="keyboard">
-        {activeKeyboard.map((row: KeyboardKey[], rowIndex: number) => (
-          <div
-            className="keyboard-row"
-            key={rowIndex}
-            style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
-          >
-            {row.map((keyData: KeyboardKey) => (
-              <HexKeyButton
-                key={keyData.id}
-                keyData={keyData}
-                onClick={() => handleKeyClick(keyData)}
-              />
-            ))}
-          </div>
-        ))}
+      <div className="keyboard-wrapper">
+        <img
+          src={activeKeyboard === KEYBOARD_1 ? logo1 : logo2}
+          alt="Keyboard Logo"
+          className="keyboard-logo"
+        />
+        <div className="keyboard">
+          {activeKeyboard.map((row: KeyboardKey[], rowIndex: number) => (
+            <div
+              className="keyboard-row"
+              key={rowIndex}
+              style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
+            >
+              {row.map((keyData: KeyboardKey) => (
+                <HexKeyButton
+                  key={keyData.id}
+                  keyData={keyData}
+                  onClick={() => handleKeyClick(keyData)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       <TypedText
