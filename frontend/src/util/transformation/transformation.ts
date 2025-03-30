@@ -10,6 +10,12 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
   { pattern: new RegExp(" ءِ", "u"), replace: " إِ" },
   { pattern: new RegExp("أََ", "u"), replace: "آ" },
+
+  { pattern: new RegExp("ُُ", "u"), replace: "ُو" },
+  { pattern: new RegExp("ِِ", "u"), replace: "ِي" },
+
+  { pattern: new RegExp(" ُ", "u"), replace: " و" },
+  { pattern: new RegExp(" ِ", "u"), replace: " ي" },
   
   { pattern: new RegExp("الءَ", "u"), replace: "الأَ" },
   { pattern: new RegExp("الءُ", "u"), replace: "الأُ" },
