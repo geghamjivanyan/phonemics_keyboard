@@ -21,6 +21,16 @@ export const TypedText: React.FC<TypedTextProps> = ({
 
   return (
     <div className={`typed-text-wrapper ${hasRhythms ? "has-rhythms" : ""}`}>
+      {hasRhythms && (
+        <div className="rhythms-container">
+          {rhythms.map((rhythm, index) => (
+            <div key={index} className="rhythm-item">
+              {rhythm}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="typed-text" dir="rtl">
         {typedText}
         {isLoading && <span className="loading-indicator">•••</span>}
