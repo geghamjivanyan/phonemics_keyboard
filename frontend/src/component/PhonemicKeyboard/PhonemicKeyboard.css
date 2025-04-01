@@ -39,10 +39,10 @@
 .keyboard-row {
     position: absolute;
     display: flex;
-    gap: 0;
+    gap: 2px;
     transform: translate(0, 75%);
 }
 
 .keyboard-row:nth-child(odd) {
-    margin-left: -120px;
+    margin-left: -90px;
 }

@@ -15,7 +15,7 @@ import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
 
-const SPACE_BETWEEN_ROW: number = 90;
+const SPACE_BETWEEN_ROW: number = 69;
 
 export const PhonemicKeyboard = () => {
   const [typedText, setTypedText] = useState<string>("");
@@ -125,7 +125,7 @@ export const PhonemicKeyboard = () => {
             <div
               className="keyboard-row"
               key={rowIndex}
-              style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
+              style={{ top: `${(rowIndex + 1) * SPACE_BETWEEN_ROW}px` }}
             >
               {row.map((keyData: KeyboardKey) => (
                 <HexKeyButton
