@@ -16,6 +16,7 @@ from django.db.models import Q
 from ..models.words import Word
 from ..models.koran import Koran
 from ..models.translit_words import TranslitWord
+from ..models.rhythms import Rhythm
 
 #
 def is_vowel(letter):
@@ -182,6 +183,7 @@ class WordView(View):
     @staticmethod
     def search(request):
         words = json.loads(request.body).get('text', None)
+        text = words
         print("WORD", words)
         #words = words.replace('_', ' ')
         if words[-1] == "ـ":
@@ -206,7 +208,10 @@ class WordView(View):
             arabic = WordView._from_arabic_to_translit(words)
             if arabic:
                 print("ARABIC", arabic)
-                cut = WordView.split(arabic)
+                if len(arabic) >= 3:
+                    cut = WordView.split(arabic)
+                else:
+                    cut = arabic
                 print("CUT", cut)
 
                 translits = cut.split(' ')
@@ -214,7 +219,7 @@ class WordView(View):
                 data = WordView.suggest(translits)
 
         data = {
-            "rhythms": ['adcsc'],
+            "rhythms": WordView.get_rhythms(text),
             "suggestions": data,
         }
 
@@ -287,6 +292,8 @@ class WordView(View):
     @staticmethod
     def _from_arabic_to_translit(text):
 
+        text = text.replace('N', '').replace('Y', '').replace('W', '')
+
         translit = {
             chr(0x064E) + chr(0x0627): 'aa',
             #chr(0x064E) + chr(0x0627): 'AA',
@@ -325,6 +332,12 @@ class WordView(View):
             chr(0x0648): 'w',
             chr(0x064A): 'y',
             ' ': ' ',
+             
+            chr(0x0626): chr(0x0621), 
+            chr(0x0625): chr(0x0621), 
+            chr(0x0623): chr(0x0621), 
+            chr(0x0624): chr(0x0621),
+            chr(0x0622): chr(0x0621) + chr(0x064E) + chr(0x0627),
         }
         a_rules = 'Lrqṣṭġḍḍḫ'
         l_rules = 'uaALLAAh'
@@ -357,22 +370,6 @@ class WordView(View):
         return s 
     
     @staticmethod
-    def split(res):
-        s = ''
-        i = 0
-        while i < len(res)-1:
-            if not is_vowel(res[i]) and is_vowel(res[i+1]):
-                s += ' ' + res[i:i+2]
-                i += 2
-            else:
-                s += res[i]
-                i += 1
-        if i < len(res):
-            s += res[-1]
-        
-        return s.strip()
-    
-    @staticmethod
     def suggest(cut):
 
         data = []
@@ -395,3 +392,91 @@ class WordView(View):
     def sort_by_frequency(lst):
         freq = Counter(lst)
         return sorted(set(lst), key=lambda x: freq[x], reverse=True)
+    
+    @staticmethod
+    def get_rhythms(text):
+
+        rhythms = Rhythm.objects.all()
+
+        text = WordView._from_arabic_to_translit(text)
+        print("TEXT", text)
+        parts = WordView.split(text)
+
+        pattern = WordView.classify(parts)
+
+        n = len(pattern)
+
+        data = []
+
+        for r in rhythms:
+            if pattern == r.pattern[:n]:
+                data.append(r.name)
+
+        return data
+
+
+    @staticmethod
+    def split(res):
+        s = ''
+        i = 0
+        print("RES", res)
+
+        # arrange the case when text len is <= 4
+
+        if len(res) == 3:
+            if is_vowel(res[i]) and is_vowel(res[i+1]) and not is_vowel(res[i+2]):
+                return res[:2] + ' ' + res[2]
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] != res[i+1]):
+                    return res[0] + ' ' + res[1:]
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] == res[i+1]):
+                    return res
+            elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
+                return res[0] + ' ' + res[1:]
+            
+        res = res + '**'
+        while i < len(res)-2:
+            # after vv if vvc 
+            if is_vowel(res[i]) and is_vowel(res[i+1]) and not is_vowel(res[i+2]):
+                s += res[i:i+2] + ' '
+                i += 2
+                print("IF I", i, "S", s)
+            # after c1 if c1c2v and c1 != c2
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] != res[i+1]): 
+                    s += ' ' + res[i]
+                    i += 1
+                    print("ELIF1 I", i, "S", s)
+            # before c1 if c1c2v and c1 = c2
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] == res[i+1]): 
+                    s += ' ' + res[i:i+2]
+                    i += 1 
+                    print("ELIF2 I", i, "S", s)
+            # before c2 if v1c2v2 
+            elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
+                s += res[i] + ' '
+                i+=1
+                print("ELIF3 I", i, "S", s)  
+            else:
+                s += res[i]
+                i += 1
+                print("ELSE I", i, "S", s)
+        
+        return s.strip()
+    
+    @staticmethod
+    def classify(text):
+        text = text.split(' ')
+        pattern = ''
+
+        for txt in text:
+            if len(text) <= 2:
+                pattern += '1'
+            elif len(text) == 3:
+                pattern += '2'
+            else:
+                pattern += '3'
+
+        return pattern

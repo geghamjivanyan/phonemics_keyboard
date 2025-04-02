@@ -51,6 +51,7 @@ class TranslitKoranView(View):
                         text = text[1:]
                     if text[-1] == '.':
                         text = text[:-1]
+                    text = text.replace('N', '').replace('Y', '').replace('W', '')
                     cut_text = TranslitKoranView.limit_consecutive_letters(text)
                     pattern = TranslitKoranView.classify(cut_text)
                     TranslitKoran(
@@ -101,7 +102,7 @@ class TranslitKoranView(View):
             else:
                 s += res[i]
                 i += 1
-        s += res[-1]
+        #s += res[-1]
 
         s = s.strip()
 

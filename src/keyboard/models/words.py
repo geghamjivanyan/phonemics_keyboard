@@ -10,6 +10,9 @@ class Word(models.Model):
     current = models.CharField(max_length=20, null=True)
     next = models.CharField(max_length=20, null=True)
 
+    def __str__(self):
+        return "{} {} {}".format(self.prev, self.current, self.next)
+
 
 @admin.register(Word)
 class ViewAdmin(admin.ModelAdmin):
@@ -19,3 +22,4 @@ class ViewAdmin(admin.ModelAdmin):
         "current",
         "next"
     )
+    
