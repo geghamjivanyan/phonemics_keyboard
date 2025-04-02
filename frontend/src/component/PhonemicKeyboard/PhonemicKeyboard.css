@@ -10,10 +10,9 @@
 
 .keyboard-wrapper {
     position: relative;
-    width: 75%;
-    height: 600px;
+    width: 65%;
+    height: 440px;
     border-radius: 20px;
-    padding: 20px;
     background-color: black;
 }
 

@@ -1,9 +1,9 @@
 import { KeyboardActions, KeyboardKey } from "../../interface";
 import spacebar from "../../assets/spacebar.svg";
 import enter from "../../assets/enter.svg";
+import deleteLeft from "../../assets/delete-left.svg";
 import globe from "../../assets/globe.png";
 import dot from "../../assets/dot-icon.png";
-import deleteLeft from "../../assets/delete-left.svg";
 import "./HexKeyButton.css";
 
 const ICONS = {

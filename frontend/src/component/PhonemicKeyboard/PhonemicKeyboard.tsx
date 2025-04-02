@@ -67,6 +67,10 @@ export const PhonemicKeyboard = () => {
     setTypedText((prev: string) => prev + suggestion);
   };
 
+  const handleRhythmClick = (rhythm: string): void => {
+    setTypedText(rhythm);
+  };
+
   const insertCharacter = (char: string): void => {
     setTypedText((prev: string) => prev + char);
   };
@@ -125,7 +129,7 @@ export const PhonemicKeyboard = () => {
             <div
               className="keyboard-row"
               key={rowIndex}
-              style={{ top: `${(rowIndex + 1) * SPACE_BETWEEN_ROW}px` }}
+              style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
             >
               {row.map((keyData: KeyboardKey) => (
                 <HexKeyButton
@@ -145,6 +149,7 @@ export const PhonemicKeyboard = () => {
         suggestions={suggestions}
         isLoading={isLoading}
         onSuggestionSelect={handleSuggestionClick}
+        onRhythmSelect={handleRhythmClick}
       />
     </div>
   );

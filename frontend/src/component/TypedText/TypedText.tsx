@@ -6,6 +6,7 @@ interface TypedTextProps {
   rhythms?: string[];
   suggestions?: string[];
   onSuggestionSelect?: (suggestion: string) => void;
+  onRhythmSelect?: (rhythm: string) => void;
   isLoading?: boolean;
 }
 
@@ -14,6 +15,7 @@ export const TypedText: React.FC<TypedTextProps> = ({
   suggestions = [],
   rhythms = [],
   onSuggestionSelect,
+  onRhythmSelect,
   isLoading = false,
 }: TypedTextProps) => {
   const hasRhythms = rhythms && rhythms.length > 0;
@@ -24,7 +26,11 @@ export const TypedText: React.FC<TypedTextProps> = ({
       {hasRhythms && (
         <div className="rhythms-container">
           {rhythms.map((rhythm, index) => (
-            <div key={index} className="rhythm-item">
+            <div
+              key={index}
+              className="rhythm-item"
+              onClick={() => onRhythmSelect && onRhythmSelect(rhythm)}
+            >
               {rhythm}
             </div>
           ))}
