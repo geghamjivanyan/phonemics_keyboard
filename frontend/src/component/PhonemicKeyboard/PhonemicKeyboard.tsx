@@ -23,6 +23,7 @@ export const PhonemicKeyboard = () => {
     useState<KeyboardKey[][]>(KEYBOARD_1);
   const [rhythms, setRhythms] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [selectedRhythm, setSelectedRhythm] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const debouncedText: string = useDebounce<string>(typedText);
 
@@ -32,7 +33,7 @@ export const PhonemicKeyboard = () => {
     const controller = new AbortController();
     void fetchSuggestions(controller.signal);
     return () => controller.abort();
-  }, [debouncedText]);
+  }, [debouncedText, selectedRhythm]);
 
   const fetchSuggestions = async (signal: AbortSignal): Promise<void> => {
     if (debouncedText.trim() === "") {
@@ -49,7 +50,7 @@ export const PhonemicKeyboard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: transformed }),
+        body: JSON.stringify({ text: transformed, rhythms: selectedRhythm }),
         signal,
       });
 
@@ -68,7 +69,7 @@ export const PhonemicKeyboard = () => {
   };
 
   const handleRhythmClick = (rhythm: string): void => {
-    setTypedText(rhythm);
+    setSelectedRhythm(rhythm);
   };
 
   const insertCharacter = (char: string): void => {
