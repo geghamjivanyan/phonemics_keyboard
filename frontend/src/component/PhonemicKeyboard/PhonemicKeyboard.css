@@ -2,15 +2,15 @@
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px;
     box-sizing: border-box;
     background-color: #b4b596;
 }
 
 .keyboard {
-    width: 65%;
-    height: 400px;
+    width: calc(6 * (var(--hex-btn-max-size) + var(--row-gap)) + 46px);
+    height: calc(4 * (var(--space-between) + var(--row-gap)));
     position: relative;
     display: flex;
     flex-direction: column;
@@ -23,10 +23,14 @@
 .keyboard-row {
     position: absolute;
     display: flex;
-    gap: 2px;
-    transform: translate(0, 75%);
+    gap: var(--row-gap);
+    /*transform: translate(0, 75%);*/
 }
 
 .keyboard-row:nth-child(odd) {
-    margin-left: -90px;
+    margin-left: calc(var(--hex-btn-max-size) / 2 * -1);
+}
+
+.keyboard-row:nth-child(even) {
+    margin-left: calc(var(--hex-btn-max-size) / 2);
 }
