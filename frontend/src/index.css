@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+:root {
+  --hex-btn-base-size: 4.5vw;
+  --hex-btn-min-size: 60px;
+  --hex-btn-max-size: 90px;
+  --row-gap: 2px;
+}
