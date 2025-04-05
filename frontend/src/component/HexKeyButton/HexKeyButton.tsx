@@ -46,7 +46,13 @@ export const HexKeyButton = ({
       onClick={onClick}
     >
       {iconSrc ? (
-        <img src={iconSrc} alt="Key icon" width={32} height={32} />
+        <img
+          src={iconSrc}
+          alt="Key icon"
+          width={40}
+          height={40}
+          className="hex-img"
+        />
       ) : (
         <span className="arabic">{keyData.arabic}</span>
       )}
