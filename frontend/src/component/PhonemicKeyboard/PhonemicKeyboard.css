@@ -9,7 +9,7 @@
 }
 
 .keyboard {
-    width: calc(6 * (var(--hex-btn-max-size) + var(--row-gap)) + 46px);
+    width: calc(6 * (var(--hex-btn-size) + var(--row-gap)) + 46px);
     height: calc(4 * (var(--space-between) + var(--row-gap)));
     position: relative;
     display: flex;
@@ -17,20 +17,20 @@
     align-items: center;
     justify-content: center;
     border-radius: 20px;
-    background-color: black;
+    background-color: var(--keyboard-background);
+    padding-top: 2px;
 }
 
 .keyboard-row {
     position: absolute;
     display: flex;
     gap: var(--row-gap);
-    /*transform: translate(0, 75%);*/
 }
 
 .keyboard-row:nth-child(odd) {
-    margin-left: calc(var(--hex-btn-max-size) / 2 * -1);
+    margin-left: calc(var(--hex-btn-size) / 2 * -1);
 }
 
 .keyboard-row:nth-child(even) {
-    margin-left: calc(var(--hex-btn-max-size) / 2);
+    margin-left: calc(var(--hex-btn-size) / 2);
 }

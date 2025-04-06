@@ -124,7 +124,7 @@ export const PhonemicKeyboard = () => {
           <div
             className="keyboard-row"
             key={rowIndex}
-            style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
+            style={{ top: `${rowIndex * SPACE_BETWEEN_ROW + 2}px` }}
           >
             {row.map((keyData: KeyboardKey) => (
               <HexKeyButton

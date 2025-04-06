@@ -1,6 +1,6 @@
 .hex-key-wrapper {
-  width: var(--hex-btn-max-size);
-  height: var(--hex-btn-max-size);
+  width: var(--hex-btn-size);
+  height: var(--hex-btn-size);
   border: none;
   outline: none;
   font-size: 1rem;

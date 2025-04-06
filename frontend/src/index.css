@@ -1,9 +1,8 @@
 :root {
-  --hex-btn-base-size: 4.5vw;
-  --hex-btn-min-size: 60px;
-  --hex-btn-max-size: 90px;
+  --hex-btn-size: 90px;
   --space-between: 73px;
   --row-gap: 2px;
+  --keyboard-background: black;
 }
 
 body {
