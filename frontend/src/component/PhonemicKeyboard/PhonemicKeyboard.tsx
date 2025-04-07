@@ -119,29 +119,23 @@ export const PhonemicKeyboard = () => {
 
   return (
     <div className="keyboard-container">
-      <div className="keyboard-wrapper">
-        <img
-          src={activeKeyboard === KEYBOARD_1 ? logo1 : logo2}
-          alt="Keyboard Logo"
-          className="keyboard-logo"
-        />
-        <div className="keyboard">
-          {activeKeyboard.map((row: KeyboardKey[], rowIndex: number) => (
-            <div
-              className="keyboard-row"
-              key={rowIndex}
-              style={{ top: `${rowIndex * SPACE_BETWEEN_ROW}px` }}
-            >
-              {row.map((keyData: KeyboardKey) => (
-                <HexKeyButton
-                  key={keyData.id}
-                  keyData={keyData}
-                  onClick={() => handleKeyClick(keyData)}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+      <div className="keyboard">
+        {activeKeyboard.map((row: KeyboardKey[], rowIndex: number) => (
+          <div
+            className="keyboard-row"
+            key={rowIndex}
+            style={{ top: `${rowIndex * SPACE_BETWEEN_ROW + 2}px` }}
+          >
+            {row.map((keyData: KeyboardKey) => (
+              <HexKeyButton
+                key={keyData.id}
+                keyData={keyData}
+                switchLogo={activeKeyboard === KEYBOARD_1 ? logo1 : logo2}
+                onClick={() => handleKeyClick(keyData)}
+              />
+            ))}
+          </div>
+        ))}
       </div>
 
       <TypedText

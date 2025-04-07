@@ -1,6 +1,6 @@
 .hex-key-wrapper {
-  width: 90px;
-  height: 90px;
+  width: var(--hex-btn-size);
+  height: var(--hex-btn-size);
   border: none;
   outline: none;
   font-size: 1rem;
@@ -27,6 +27,10 @@
   .english {
     font-size: 0.8rem;
     margin: 1.5rem 0 0 1rem;
+  }
+
+  .hex-img {
+    object-fit: contain;
   }
 }
 
