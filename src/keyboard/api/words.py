@@ -39,7 +39,7 @@ class WordView(View):
         for block in blocks:
             if j % 100 == 0:
                 print("J", j, "out of", count)
-            words = block.easy_shrift.split(' ')
+            words = block.arabic.split(' ')
             #words = ['aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh']
             if len(words) == 2:
                 Word.objects.get_or_create(prev=words[0], current=words[1], next=None)
@@ -180,13 +180,18 @@ class WordView(View):
         for obj in objs:
             obj.delete()
 
+        return HttpResponse("OK")
+
     @staticmethod
     def search(request):
+        print("DATA", json.loads(request.body))
         words = json.loads(request.body).get('text', None)
+        rhythm = json.loads(request.body).get('rhythms', None)
         text = words
         print("WORD", words)
         #words = words.replace('_', ' ')
-        if words[-1] == "ـ":
+        if words[-1] == " ":
+            WordView.suggest_next_word(words)
             words = words.split(' ')
             data = []
 
@@ -216,10 +221,14 @@ class WordView(View):
 
                 translits = cut.split(' ')
                 print("TRANSLIT", translits)
-                data = WordView.suggest(translits)
+                data = WordView.suggest(translits, rhythm)
 
+        if rhythm:
+            rhythms = [rhythm]
+        else:
+            rhythms = WordView.get_rhythms(text)
         data = {
-            "rhythms": WordView.get_rhythms(text),
+            "rhythms": rhythms,
             "suggestions": data,
         }
 
@@ -295,6 +304,13 @@ class WordView(View):
         text = text.replace('N', '').replace('Y', '').replace('W', '')
 
         translit = {
+            chr(0x0626): chr(0x02bc), 
+            chr(0x0625): chr(0x02bc), 
+            chr(0x0623): chr(0x02bc), 
+            chr(0x0624): chr(0x02bc),
+            chr(0x0621): chr(0x02bc),
+            chr(0x064E) + chr(0x064E): 'aa', 
+            chr(0x0622): chr(0x02bc) + 'aa',
             chr(0x064E) + chr(0x0627): 'aa',
             #chr(0x064E) + chr(0x0627): 'AA',
             chr(0x0650) + chr(0x064A): 'ii',
@@ -302,7 +318,6 @@ class WordView(View):
             chr(0x064E): 'a',
             chr(0x0650): 'i',
             chr(0x064F): 'u',
-            chr(0x0621): 'ʼ',
             chr(0x0639): 'ʻ',
             chr(0x0628): 'b',
             chr(0x062A): 't',
@@ -332,33 +347,47 @@ class WordView(View):
             chr(0x0648): 'w',
             chr(0x064A): 'y',
             ' ': ' ',
-             
-            chr(0x0626): chr(0x0621), 
-            chr(0x0625): chr(0x0621), 
-            chr(0x0623): chr(0x0621), 
-            chr(0x0624): chr(0x0621),
-            chr(0x0622): chr(0x0621) + chr(0x064E) + chr(0x0627),
         }
         a_rules = 'Lrqṣṭġḍḍḫ'
         l_rules = 'uaALLAAh'
 
         s = ''
         i = 0
-        while i < len(text):
 
+        #we have letter 0627:
+        #  if at the very beginning of text, then: 0627 = 02bc + 064E
+
+
+        if text[0] == chr(0x0627):
+            s += chr(0x2bc) + chr(0x064E)
+            i += 1
+
+        while i < len(text):
+            if i < len(text) - 1 and text[i+1] == chr(0x0651):
+                s += 2*translit[text[i]]
+                i+=2 
+
+            if i < len(text) - 1:
+                if text[i-1] == ' ' and text[i] == chr(0x0627):
+                    s += ' '
+                    i += 1
+                
             if text[i:i+2] in translit:
-                if i > 1 and translit[text[i-1]] in a_rules and \
-                        text[i] == chr(0x064E):
-                        s += 'AA'
-                else:
-                    s += translit[text[i:i+2]]
-                i += 2
-            else:
-                try:
-                    if i > 0 and translit[text[i-1]] in a_rules and \
+                if i > 1 and translit.get(text[i-1], None) and translit[text[i-1]] in a_rules and \
                         text[i] == chr(0x064E):
                         s += 'A'
-                    elif i > 0 and translit[text[i-1]] in l_rules and \
+                        i += 1
+                else:
+                    s += translit[text[i:i+2]]
+                    i += 2
+            else:
+                try:
+                    if i > 0 and text[i-1] == chr(0x064E) and text[i] == chr(0x0627):
+                        s += 'a'
+                    elif i > 0 and translit.get(text[i-1], None) and translit[text[i-1]] in a_rules and \
+                        text[i] == chr(0x064E):
+                        s += 'A'
+                    elif i > 0 and translit.get(text[i-1], None) and translit[text[i-1]] in l_rules and \
                         text[i] == chr(0x0644):
                         s += 'L'
                     else:
@@ -367,26 +396,46 @@ class WordView(View):
                     print("KeyError", err)
                 i += 1
 
+            if s[-2:] == 'aA':
+                s = s.replace('aA', 'aa')
+            elif s[-2:] == 'Aa':
+                s = s.replace('Aa', 'AA')
+
         return s 
     
     @staticmethod
-    def suggest(cut):
+    def suggest(cut, rhythm):
 
         data = []
         sort_data = []
         if len(cut) > 1:
-            suggestions = TranslitWord.objects.filter(prev=cut[-2], current=cut[-1])
-            print("Suggestions 2")
+            suggestions = TranslitWord.objects.filter(prev__iexact=cut[-2], current__iexact=cut[-1])
             for suggest in suggestions:
                 if suggest.next:
                     sort_data.append(suggest.next)
                     res = WordView._from_translit_to_arabic(suggest.next)
                     data.append(res)
 
-        s_data = WordView.sort_by_frequency(sort_data)
+        text = ' '.join(cut)
+        s_data = WordView.sort_by_frequency(data)
+
+        pattern = WordView.classify(text)
+        
+        n = len(pattern)
+
+        r = Rhythm.objects.get(name=rhythm)
+        next = r.pattern[n]
+
+        data = []
+
         for d in s_data:
-            print(d)
-        return WordView.sort_by_frequency(data)
+            if len(d) == 1:
+                if next == 1 and n == len(r.pattern) - 1:
+                    data.append(d)
+            elif WordView.classify(d) == next:
+                data.append(d)
+
+        return data
     
     @staticmethod
     def sort_by_frequency(lst):
@@ -419,8 +468,8 @@ class WordView(View):
     def split(res):
         s = ''
         i = 0
-        print("RES", res)
 
+        res = res.replace('L', 'l')
         # arrange the case when text len is <= 4
 
         if len(res) == 3:
@@ -435,34 +484,29 @@ class WordView(View):
             elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
                 return res[0] + ' ' + res[1:]
             
-        res = res + '**'
+        res = res + '++'
         while i < len(res)-2:
             # after vv if vvc 
             if is_vowel(res[i]) and is_vowel(res[i+1]) and not is_vowel(res[i+2]):
                 s += res[i:i+2] + ' '
                 i += 2
-                print("IF I", i, "S", s)
             # after c1 if c1c2v and c1 != c2
             elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
                 if not(is_vowel(res[2]) and res[i] != res[i+1]): 
-                    s += ' ' + res[i]
+                    s += res[i] + ' '
                     i += 1
-                    print("ELIF1 I", i, "S", s)
             # before c1 if c1c2v and c1 = c2
             elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
                 if not(is_vowel(res[2]) and res[i] == res[i+1]): 
                     s += ' ' + res[i:i+2]
                     i += 1 
-                    print("ELIF2 I", i, "S", s)
             # before c2 if v1c2v2 
             elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
                 s += res[i] + ' '
-                i+=1
-                print("ELIF3 I", i, "S", s)  
+                i+=1 
             else:
                 s += res[i]
                 i += 1
-                print("ELSE I", i, "S", s)
         
         return s.strip()
     
@@ -470,13 +514,110 @@ class WordView(View):
     def classify(text):
         text = text.split(' ')
         pattern = ''
-
         for txt in text:
-            if len(text) <= 2:
+            if len(txt) <= 2:
                 pattern += '1'
-            elif len(text) == 3:
+            elif len(txt) == 3:
                 pattern += '2'
             else:
                 pattern += '3'
 
         return pattern
+    
+
+    """
+    We need to write a new code for suggesting words in poerty composition. User types first word, so we have to continuously evaluate the Prosodic Metre of the typed text, and to know the Metre of the words before suggesting them. Therefore:
+    1 For X =  (ث ص ض ن ت س ش ر ز د ذ ط ظ)
+    2 For C = (ج ح خ ه ع غ ف ق ك م ل و ي ء)
+
+    1 The first word or syllable is styped by the User.
+    2 If the word starts with:
+        1 (ا) : (ءَ)
+        2 (ال) + X : (ءَ) + XX
+        3 (هؤلاء) and other words turned phonemic
+        4 (ُوا) : (ُو)
+        End of word 5 Tanween : (a, A, u, i) + n
+        6 With the above the first word is phonemic and can be split into syllables.
+        7 Adding a tanween to a word will transform the last long syllable, (..2):(..12)
+        8 No word starting with (ال) can end with Tanween
+        9 Rule A: (“َ ا” = “َ”)، (“َا ا”=“َ”), (“ُ ا”=“ُ”), (“ُوا ا”=“ُ”), (“ِ ا”=“ِ”), (“ِي ا”=“ِ”), (“َى ا”=“َ”)
+        10 After first word, any word will be weighed Metrically without first (ا)
+        11 For the words A=(" فَ"، " وَكَ"، " كَ"، " فَكَ"،" كَبِ"، " وَ"،" فَوَ"، " وَبِ"، " بِ"، " أَبِ"، " فَبِ"):
+        1 (A) + (ال): (A) + (“ ”) + (ال)"
+    """
+    
+    @staticmethod
+    def suggest_next_word(text):
+
+        print("BEFORE", text)
+    
+        X = ["ث", "ص", "ض", "ن", "ت", "س", "ش", "ر", "ز", "د", "ذ", "ط", "ظ"]
+        C = ["ج", "ح", "خ", "ه", "ع", "غ", "ف", "ق", "ك", "م", "ل", "و", "ي", "ء"]
+
+        #  1 (ا) : (ءَ) +
+        if text[0] == "ا":
+            text = "ءَ" + text[1:]
+        
+        # 2 (ال) + X : (ءَ) + XX  +
+        for x in X:
+            term = "ال" + x
+            if text.startswith(term):
+                start = "ءَ" + x + x
+                text = start + text[len(term)]
+
+        mapping = {
+            "هَذا": "هَاذا",
+            "الرَّحْمَنِ": "ارْرَحْمَانِ",
+            "أُولَئِكَ": "أُلَائِكَ",
+            "هَؤُلَاء": "هَاؤُلَاء",
+            "سَمَوَات": "سَمَاوَات",
+            "الله": "اللاه",
+            "اللَه": "الْلاه",
+            "اللَّه": "الْلاه",
+            "لِلَّهِ": "لِلْلَاهِ",
+            "الَّذِي": "الْلَذِي",
+            "الَّذِينَ": "الْلَذِينَ",
+            "لِلَّذِي": "لِلْلَذِي"
+        }
+        # 3 (هؤلاء) and other words turned phonemic  +
+        for m in mapping:
+            if text.startswith(m):
+                text = mapping[m] + text[len(m):]
+
+        # 4 "ُوا" : "ُو"
+
+        if text.endsswith("ُوا"):
+            text = text[:-len("ُوا")] + "ُو"
+
+        # 5 (a, A, u, i) + n
+        vowels = [chr(0x064E), chr(0x0650), chr(0x064F)]
+        for v in vowels:
+            if text.endswith(v + " "):
+                text = text[:-1] + chr(0x0646) + " "
+
+        # 
+
+        TR = {
+            "َ ا": "َ",
+            "َا ا": "َ",
+            "ُ ا": "ُ",
+            "ُوا ا": "ُ",
+            "ِ ا": "ِ",
+            "ِي ا": "ِ",
+            "َى ا": "َ"
+        }
+        # 9 Rule A: (“َ ا” = “َ”)، (“َا ا”=“َ”), (“ُ ا”=“ُ”), (“ُوا ا”=“ُ”), (“ِ ا”=“ِ”), (“ِي ا”=“ِ”), (“َى ا”=“َ”)
+        for a in TR:
+            text = text.replace(a, TR[a])
+
+        # 11 For the words A=(" فَ"، " وَكَ"، " كَ"، " فَكَ"،" كَبِ"، " وَ"،" فَوَ"، " وَبِ"، " بِ"، " أَبِ"، " فَبِ")
+        # (A) + (ال): (A) + (“ ”) + (ال)"
+        A = ["فَ", "وَكَ", "كَ", "فَكَ", "كَبِ", "وَ", "فَوَ", "وَبِ", "بِ", "أَبِ", "فَبِ"]
+
+        for a in A:
+            text = text.replace(a + "ال", a + " " + "ال")
+
+
+        print("AFTER", text)
+
+
