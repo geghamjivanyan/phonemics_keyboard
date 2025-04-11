@@ -12,6 +12,8 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
+from django.db.models import Value
+from django.db.models.functions import Right
 
 from ..models.words import Word
 from ..models.koran import Koran
@@ -42,23 +44,21 @@ class WordView(View):
             words = block.arabic.split(' ')
             #words = ['aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh']
             if len(words) == 2:
-                Word.objects.get_or_create(prev=words[0], current=words[1], next=None)
+                Word.objects.get_or_create(current=words[0], next=words[1])
             elif len(words) == 1:
-                Word.objects.get_or_create(prev=words[0], current=None, next=None)
+                Word.objects.get_or_create(current=words[0], next=None)
             else:
-                Word.objects.get_or_create(prev=words[0], current=words[1], next=words[2])
-                for i in range(2, len(words)-1, 1):
+                Word.objects.get_or_create(current=words[0], next=words[1])
+                for i in range(1, len(words)-1, 1):
                     next=words[i+1]
-                    prev= words[i-1]
                     current = words[i]
                     Word.objects.get_or_create(
-                        prev=prev, 
                         current=current, 
                         next=next
                     )
 
 
-                Word.objects.get_or_create(prev=words[-2], current=words[-1], next=None)
+                Word.objects.get_or_create(current=words[-1], next=None)
             
         return HttpResponse(
             status=200,
@@ -190,24 +190,15 @@ class WordView(View):
         text = words
         print("WORD", words)
         #words = words.replace('_', ' ')
+        new_rhyms = None
         if words[-1] == " ":
-            WordView.suggest_next_word(words)
-            words = words.split(' ')
+            
+            words = words.strip().split(' ')
             data = []
-
-            if len(words) == 1:
-                result = Word.objects.filter(prev=words[0])
-                for r in result:
-                    data.append(r.current)
-            if len(words) == 2:
-                result = Word.objects.filter(prev=words[0], current=words[1])
-                if len(result):
-                    for r in result:
-                        data.append(r.next)
-                else:
-                    result = Word.objects.filter(prev=words[1])
-                    for r in result:
-                        data.append(r.current)
+            data = WordView.suggest_next_word(words[-1], rhythm)
+            new_rhyms = WordView.suggest_new_line(words[-1])
+            print("SUGGESTED WORDS\n", data)
+            print("SUGGESTED rhyms\n", new_rhyms)
         else:
             print("TRANSLIT")
             arabic = WordView._from_arabic_to_translit(words)
@@ -230,6 +221,7 @@ class WordView(View):
         data = {
             "rhythms": rhythms,
             "suggestions": data,
+            "new_rhyms": new_rhyms,
         }
 
         return HttpResponse(
@@ -312,6 +304,7 @@ class WordView(View):
             chr(0x064E) + chr(0x064E): 'aa', 
             chr(0x0622): chr(0x02bc) + 'aa',
             chr(0x064E) + chr(0x0627): 'aa',
+            chr(0x064E) + chr(0x0649): 'aa',
             #chr(0x064E) + chr(0x0627): 'AA',
             chr(0x0650) + chr(0x064A): 'ii',
             chr(0x064F) + chr(0x0648): 'uu',
@@ -422,18 +415,18 @@ class WordView(View):
         pattern = WordView.classify(text)
         
         n = len(pattern)
-
-        r = Rhythm.objects.get(name=rhythm)
-        next = r.pattern[n]
-
+        print("R NAME", rhythm)
         data = []
+        if rhythm:
+            r = Rhythm.objects.get(name=rhythm)
+            next = r.pattern[n]
 
-        for d in s_data:
-            if len(d) == 1:
-                if next == 1 and n == len(r.pattern) - 1:
+            for d in s_data:
+                if len(d) == 1:
+                    if next == 1 and n == len(r.pattern) - 1:
+                        data.append(d)
+                elif WordView.classify(d) == next:
                     data.append(d)
-            elif WordView.classify(d) == next:
-                data.append(d)
 
         return data
     
@@ -512,9 +505,13 @@ class WordView(View):
     
     @staticmethod
     def classify(text):
+        print("CLASS 1", text)
         text = text.split(' ')
+        print("CLASS 2", text)
         pattern = ''
         for txt in text:
+            if len(txt) == 0:
+                continue
             if len(txt) <= 2:
                 pattern += '1'
             elif len(txt) == 3:
@@ -523,7 +520,6 @@ class WordView(View):
                 pattern += '3'
 
         return pattern
-    
 
     """
     We need to write a new code for suggesting words in poerty composition. User types first word, so we have to continuously evaluate the Prosodic Metre of the typed text, and to know the Metre of the words before suggesting them. Therefore:
@@ -536,7 +532,7 @@ class WordView(View):
         2 (ال) + X : (ءَ) + XX
         3 (هؤلاء) and other words turned phonemic
         4 (ُوا) : (ُو)
-        End of word 5 Tanween : (a, A, u, i) + n
+        End of word 5 Tanween : (a, A, u, i"ُو") + n
         6 With the above the first word is phonemic and can be split into syllables.
         7 Adding a tanween to a word will transform the last long syllable, (..2):(..12)
         8 No word starting with (ال) can end with Tanween
@@ -547,7 +543,7 @@ class WordView(View):
     """
     
     @staticmethod
-    def suggest_next_word(text):
+    def apply_transformation_rules(text):
 
         print("BEFORE", text)
     
@@ -586,7 +582,7 @@ class WordView(View):
 
         # 4 "ُوا" : "ُو"
 
-        if text.endsswith("ُوا"):
+        if text.endswith("ُوا"):
             text = text[:-len("ُوا")] + "ُو"
 
         # 5 (a, A, u, i) + n
@@ -619,5 +615,208 @@ class WordView(View):
 
 
         print("AFTER", text)
+
+        return text
+
+    """
+    we will split every word into 3 parts:
+    Start  S- part before first cv
+    Middle M- part from first cv until but not include last cv
+    Last   L- starts last cv
+    
+    if we have a desired rhythm R = [DEFGHIJK]
+    for first word:
+        if S+M+l has n number of syllables equal in length as first n intries in R:
+        any word starting with a consonant is a suggestion option 
+        if its m number of syllables has same lengths as the next m entries in R after the nth entry
+
+    R = [DEFGHIJK]
+    L last word
+    S next word
+    M next word
+
+    last letter in last word
+    next word starts with a transitional vowel
+    if words always start with a consonant, we calculate the words as they r
+
+
+    L can be c1v1, or c1v1v2, or c1v1c2
+    when S of next word is V5C5 c6v6..
+    c1v1 + V5C5c6v6 = c1v1C5 + c6v6..
+    c1v1v2+ V5C5c6v6 = c1v1C5 + c6v6..
+    c1v1c2 + V5C5c6v6 =c1v1 + c2V5C5 +c6v6..
+
+    c1v1 + V5C5 = c1v1C5       
+    c1v1v2+ V5C5 = c1v1C5 
+    c1v1c2 + V5C5 = c1v1 + c2V5C5
+    """
+    def suggest_next_word(text, rhythms):
+
+        S, M, L = WordView.get_S_M_L(text)
+
+        cut = WordView.split(WordView._from_arabic_to_translit(text))
+
+        pattern = WordView.classify(cut)
+        print("WPATTERN", pattern)
+        suggestions = []
+        # do this for many rhythms
+
+        if rhythms is None:
+            rhythms = []
+        if type(rhythms) == str:
+            rhythms = [rhythms]
+        print("RRRR", rhythms)
+        for rhythm in rhythms:
+            r = Rhythm.objects.get(name=rhythm)
+
+            if r.pattern.startswith(pattern):
+                words = Word.objects.filter(current=text)
+                print("IIIIIIIF", r.pattern)
+                for word in words:
+                    print("WWW", word)
+                    SW, MW, LW = WordView.get_S_M_L(word.next)
+                    print("SMLW", SW, MW, LW)
+                    ptr = WordView.classify(SW+MW)
+                    print("WWPAT", ptr)
+                    if r.pattern.startswith(pattern+ptr):
+                        print("IIF RHYTHMS")
+                        tr_word = WordView._from_arabic_to_translit(word.next)
+                        print("TR WORD", tr_word)
+                        if not is_vowel(tr_word[0]) and \
+                            len(L) == 2 and \
+                            not is_vowel(L[0]) and\
+                            is_vowel(L[1]):
+                            print("SUG IG")
+                            suggestions.append(word.next)
+                        elif len(L) == 3 and not is_vowel(L[0]) and is_vowel(L[1]) and is_vowel(L[2]):
+                            print("SUG elif 1")
+                            suggestions.append(word.next)
+                        elif len(L) == 3 and not is_vowel(L[0]) and is_vowel(L[1]) and not is_vowel(L[2]):
+                            if WordView.classify(WordView.split(L + SW)) == '12':
+                                print("SUG elif 2") 
+                                suggestions.append(word.next)
+
+        return suggestions
+
+    def get_S_M_L(text):
+        text = WordView.apply_transformation_rules(text)
+        text = WordView._from_arabic_to_translit(text)
+        S = ''
+        M = ''
+        L = ''
+
+        # get first cv index
+        i = 0 
+        while i < len(text) -1:
+            if not is_vowel(text[i]) and is_vowel(text[i+1]):
+                break
+            else:
+                i += 1
+        
+        # S part
+        S = text[:i]
+
+        # get last cv index
+        j = len(text) - 1
+        while j > 1:
+            if is_vowel(text[j]) and not is_vowel(text[j-1]):
+                j -= 1
+                break
+            else:
+                j -= 1
+        
+        # L part
+        L = text[j:]  
+        
+        # M part
+        M = text[i:j]
+
+        return S, M, L
+    
+    """
+    1- We always get cvv. at the end, even if its cv.
+    2- Before CV. We we can get any of:
+    • VV                                              VVCV.
+    • AW or AY                                VwCV. Or VyCV.
+    • VVcv                                         VVcvCV.
+
+    So we have cases for ends with:
+    • 21 or 22: in both cases will have vvcv. Or vvcvv.
+    • Or we can have zxcv. Or zxcvv. Where x=(w, y) z=(a,A,i,u)
+    • 212 or 211 vvcvCV. Or vvcvCVV. 
+    fdg hgj hgjk maanila  > maanilaa > cvv cv cvv.
+                  saa ni laa
+    vvcv.
+    vXcv.   x=wy
+    vvcvcvv.
+    
+    always ends with cv or cvv, always cv=cvv
+    go to vv or vw or vy before that
+    
+    u will need any word, or words that end up with the above syllables
+        """
+    @staticmethod
+    def is_rhythmable(text):
+        text = WordView._from_arabic_to_translit(text)
+
+        if len(text) < 4:
+            return False 
+        
+        if is_vowel(text[-4]) and is_vowel(text[-3]) and not is_vowel(text[-2]) and is_vowel(text[-1]):
+            return True, 4
+        
+        if is_vowel(text[-4]) and not is_vowel(text[-2]) and is_vowel(text[-1]):
+            if text[-3] in 'wy':
+                return True, 4
+            
+        if len(text) > 6:
+            if is_vowel(text[-7]) and is_vowel(text[-6]) and not is_vowel(text[-5]) and \
+                is_vowel(text[-4]) and not is_vowel(text[-3]) and \
+                is_vowel(text[-2]) and is_vowel(text[-1]):
+                    return True, 7
+            
+
+        return False, 0
+    
+    @staticmethod
+    def suggest_new_line(text):
+        b, t = WordView.is_rhythmable(text)
+
+        suggestions = []
+        if b:
+            suffix = text[-t:]
+
+            rhymes = Word.objects.annotate(
+                ending=Right('next', t)
+            ).filter(ending=suffix)
+    
+            suggestions = [w.next for w in rhymes]
+
+        return suggestions
+
+    @staticmethod
+    def new_line(text):
+        text = WordView.apply_transformation_rules(text)
+        text = WordView._from_arabic_to_translit(text)
+
+        cut = WordView.split(text)
+
+        # pattern of text
+        pattern = WordView.classify(cut)
+
+        # pattern of last word
+        lp = WordView.classify(last)
+
+        # pattern without last word 
+        rp = pattern[:-len(lp)]
+
+        lines = []
+        for rhyme in rhymes:
+            line = ''
+            ptr = WordView.classify(rhyme.current + rhyme.next)
+            if pattern.endswith(ptr):
+                line = rhyme.current + ' ' + rhyme.next
+
+        return lines  
 
 
