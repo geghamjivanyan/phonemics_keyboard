@@ -505,9 +505,9 @@ class WordView(View):
     
     @staticmethod
     def classify(text):
-        print("CLASS 1", text)
+        #print("CLASS 1", text)
         text = text.split(' ')
-        print("CLASS 2", text)
+        #print("CLASS 2", text)
         pattern = ''
         for txt in text:
             if len(txt) == 0:
@@ -819,4 +819,11 @@ class WordView(View):
 
         return lines  
 
+
+    """
+    we need to work out the easy shrift typing, and suggestions for easy shrift (in full dots and diacritics)
+    1- we type in easy shrift, get suggestions in full text
+    2- as we switch between easy shrift and phonemic keyboards, the same text changes between easy shrift and full text
+    if we do not have the word in full text, no suggestion is given
+    """
 
