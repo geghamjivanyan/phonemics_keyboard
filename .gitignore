@@ -9,6 +9,8 @@ __pycache__/
 #
 src/keyboard/models/migrations/
 
+notes.txt
+
 # Distribution / packaging
 .Python
 build/
