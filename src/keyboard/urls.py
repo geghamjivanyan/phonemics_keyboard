@@ -35,7 +35,6 @@ urlpatterns = [
     path('translit_words/', TranslitWordView.as_view()),
     path('manage/pattern', TranslitWordView.manage_pattern),
     path('easy_shrift', KoranView.easy_shrift),
-    path('word/easy_shrift', WordView.easy_shrift),
     path('dots/', WordView.remove_dots),
     path('words/remove', WordView.remove),
     path('koran/remove', KoranView.remove),

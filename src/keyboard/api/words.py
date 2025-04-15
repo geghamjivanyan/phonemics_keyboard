@@ -2,17 +2,8 @@
 import json
 
 #
-from datetime import datetime
-from collections import Counter
-
-#
 from django.views.generic import View
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
-from django.db.models import Q
-from django.db.models import Value
+from django.http import HttpResponse
 from django.db.models.functions import Right
 
 from ..models.words import Word
@@ -20,17 +11,11 @@ from ..models.koran import Koran
 from ..models.translit_words import TranslitWord
 from ..models.rhythms import Rhythm
 
-#
-def is_vowel(letter):
-    """
-    check if letter is vowel
+from ..tools.utils import is_vowel, sort_by_frequency
+from ..tools.constants import Diacritics as D
+from ..tools.transformation_tools import from_arabic_to_translit, from_translit_to_arabic 
+from ..tools.transformation_tools import classify
 
-    :params letter - letter which should be checked
-
-    :returns: True or False
-    """
-    vowels = 'aiuAYNW*'
-    return letter in vowels
 
 class WordView(View):
 
@@ -39,26 +24,37 @@ class WordView(View):
         count = len(blocks)
         j = 0
         for block in blocks:
-            if j % 100 == 0:
-                print("J", j, "out of", count)
             words = block.arabic.split(' ')
-            #words = ['aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh']
             if len(words) == 2:
-                Word.objects.get_or_create(current=words[0], next=words[1])
+                Word.objects.get_or_create(
+                    current=words[0], 
+                    next=words[1],
+                    es_current=WordView.remove_dots(words[0]),
+                    es_next=WordView.remove_dots(words[1]), 
+                )
             elif len(words) == 1:
-                Word.objects.get_or_create(current=words[0], next=None)
+                Word.objects.get_or_create(
+                    current=words[0], 
+                    next=None,
+                    es_current=WordView.remove_dots(words[0]),
+                    es_next=None
+                )
             else:
                 Word.objects.get_or_create(current=words[0], next=words[1])
                 for i in range(1, len(words)-1, 1):
-                    next=words[i+1]
-                    current = words[i]
                     Word.objects.get_or_create(
-                        current=current, 
-                        next=next
+                        current=words[i], 
+                        next=words[i+1],
+                        es_current=WordView.remove_dots(words[0]),
+                        es_next=WordView.remove_dots(words[1]),
                     )
 
-
-                Word.objects.get_or_create(current=words[-1], next=None)
+                Word.objects.get_or_create(
+                    current=words[-1], 
+                    next=None,
+                    es_current=WordView.remove_dots(words[-1]),
+                    es_next=None    
+                )
             
         return HttpResponse(
             status=200,
@@ -66,113 +62,17 @@ class WordView(View):
         )
 
     @staticmethod
-    def easy_shrift(request):
-
-        words = Word.objects.all()
-        count = len(words)
-        i = 0
-        for word in words:
-            if i % 100 == 0:
-                print(i, "out of", count)
-            i+=1
-            word.prev = WordView.remove_d(word.prev)
-            if word.current:
-                word.current = WordView.remove_d(word.current)
-            if word.next:
-                word.next = WordView.remove_d(word.next)
-
-            word.save()
-
-        return HttpResponse("OK")        
-
-    @staticmethod
-    def remove_d(text):
+    def remove_dots(text):
 
         text = text.encode('utf-8')
-
-        diacritics = [
-            chr(0x064F).encode('utf-8'),  
-            chr(0x064E).encode('utf-8'), 
-            chr(0x064D).encode('utf-8'), 
-            chr(0x064C).encode('utf-8'), 
-            chr(0x064B).encode('utf-8'),
-            chr(0x0651).encode('utf-8'), 
-            chr(0x0650).encode('utf-8'),
-            chr(0x0652).encode('utf-8'), 
-        ]
-
-        dotless = {
-            chr(0x0628).encode('utf-8'): chr(0x066E).encode('utf-8'),
-            chr(0x062A).encode('utf-8'): chr(0x066E).encode('utf-8'),
-            chr(0x062B).encode('utf-8'): chr(0x066E).encode('utf-8'),
-            chr(0x062C).encode('utf-8'): chr(0x062D).encode('utf-8'),
-            chr(0x062E).encode('utf-8'): chr(0x062D).encode('utf-8'),
-            chr(0x0630).encode('utf-8'): chr(0x062F).encode('utf-8'),
-            chr(0x0632).encode('utf-8'): chr(0x0631).encode('utf-8'),
-            chr(0x0634).encode('utf-8'): chr(0x0633).encode('utf-8'),
-            chr(0x0636).encode('utf-8'): chr(0x0635).encode('utf-8'),
-            chr(0x0638).encode('utf-8'): chr(0x0637).encode('utf-8'),
-            chr(0x063A).encode('utf-8'): chr(0x0639).encode('utf-8'),
-            chr(0x0629).encode('utf-8'): chr(0x0647).encode('utf-8'),
-        }
         
-        for d in diacritics:
+        for d in D.diacritics:
             text = text.replace(d, b'')
             
-        for k, v in dotless.items():
+        for k, v in D.dotless.items():
             text = text.replace(k, v)
             
         return text.decode('utf-8')
-
-
-    @staticmethod
-    def _remove_dots(text):
-        is_change = False
-        text += '*'
-        dots = {
-            chr(0x062D).encode("utf-8") + b'.': chr(0x062E).encode("utf-8"),
-            chr(0x062E).encode("utf-8") + b'.': chr(0x062C).encode("utf-8"),
-            chr(0x066E).encode("utf-8") + b'.': chr(0x0628).encode("utf-8"),
-            chr(0x0628).encode("utf-8") + b'.': chr(0x062A).encode("utf-8"),
-            chr(0x0646).encode("utf-8") + b'.': chr(0x062A).encode("utf-8"),
-            chr(0x0647).encode("utf-8") + b'.': chr(0x0629).encode("utf-8"),
-            chr(0x064E).encode("utf-8") + b'.': chr(0x064B).encode("utf-8"),
-            chr(0x064F).encode("utf-8") + b'.': chr(0x064C).encode("utf-8"),
-            chr(0x0650).encode("utf-8") + b'.': chr(0x064D).encode("utf-8"),
-            chr(0x0631).encode("utf-8") + b'.': chr(0x0632).encode("utf-8"),
-            chr(0x062F).encode("utf-8") + b'.': chr(0x0630).encode("utf-8"),
-            chr(0x062A).encode("utf-8") + b'.': chr(0x062B).encode("utf-8"),
-            chr(0x0637).encode("utf-8") + b'.': chr(0x0638).encode("utf-8"),
-            chr(0x0633).encode("utf-8") + b'.': chr(0x0634).encode("utf-8"),
-            chr(0x0635).encode("utf-8") + b'.': chr(0x0636).encode("utf-8"),
-            chr(0x0639).encode("utf-8") + b'.': chr(0x063A).encode("utf-8"),
-        }
-        txt = ''
-        i = 0
-        while i < len(text)-1:
-            if text[i:i+2].encode('utf-8') in dots:
-                print("LETTER", text[i:i+2])
-                txt += dots[text[i:i+2].encode('utf-8')].decode("utf-8")
-                i += 2
-                is_change = True 
-            else:
-                txt += text[i]
-                i += 1
-
-        return txt, is_change
-    
-    @staticmethod
-    def remove_dots(request):
-        text = 'ح..'
-        txt = text
-        is_change = True
-
-        while is_change:
-            print("AAAAA")
-            text, is_change = WordView._remove_dots(text)
-
-        return HttpResponse("Before {} -> After {}".format(txt, text))
-
 
     @staticmethod
     def remove(request):
@@ -180,7 +80,10 @@ class WordView(View):
         for obj in objs:
             obj.delete()
 
-        return HttpResponse("OK")
+        return HttpResponse(
+            status=200,
+            content_type="application/json; charset=utf-8",
+        )
 
     @staticmethod
     def search(request):
@@ -189,7 +92,7 @@ class WordView(View):
         rhythm = json.loads(request.body).get('rhythms', None)
         text = words
         print("WORD", words)
-        #words = words.replace('_', ' ')
+        
         new_rhyms = None
         if words[-1] == " ":
             
@@ -201,7 +104,7 @@ class WordView(View):
             print("SUGGESTED rhyms\n", new_rhyms)
         else:
             print("TRANSLIT")
-            arabic = WordView._from_arabic_to_translit(words)
+            arabic = from_arabic_to_translit(words)
             if arabic:
                 print("ARABIC", arabic)
                 if len(arabic) >= 3:
@@ -229,172 +132,6 @@ class WordView(View):
             status=200,
             content_type="application/json; charset=utf-8",
         )
-
-    @staticmethod
-    def _from_translit_to_arabic(text):
-
-        translit = {
-            'aa': chr(0x064E) + chr(0x0627),
-            'AA': chr(0x064E) + chr(0x0627),
-            'ii': chr(0x0650) + chr(0x064A),
-            'uu': chr(0x064F) + chr(0x0648),
-            'A':  chr(0x064E),
-            'a':  chr(0x064E),
-            'i':  chr(0x0650),
-            'u':  chr(0x064F),
-            'ʼ':  chr(0x0621),
-            'ʻ':  chr(0x0639),
-            'b':  chr(0x0628),
-            't':  chr(0x062A),
-            'd':  chr(0x062F),
-            'ǧ':  chr(0x062C),
-            'r':  chr(0x0631),
-            'ṯ':  chr(0x062B),
-            'z':  chr(0x0632),
-            's':  chr(0x0633),
-            'ḥ':  chr(0x062D),
-            'ḫ':  chr(0x062E),
-            'ḏ':  chr(0x0630),
-            'ṣ':  chr(0x0635),
-            'š':  chr(0x0634),
-            'ḍ':  chr(0x0636),
-            'ẓ':  chr(0x0638),
-            'ṭ':  chr(0x0637),
-            'ġ':  chr(0x063A),
-            'f':  chr(0x0641),
-            'q':  chr(0x0642),
-            'k':  chr(0x0643),
-            'l':  chr(0x0644),
-            'L':  chr(0x0644),
-            'm':  chr(0x0645),
-            'n':  chr(0x0646),
-            'h':  chr(0x0647),
-            'w':  chr(0x0648),
-            'y':  chr(0x064A),
-            ' ': ' ',
-        }
-
-        s = ''
-        i = 0
-        while i < len(text):
-
-            if text[i:i+2] in translit:
-                s += translit[text[i:i+2]]
-                i += 2
-            else:
-                try:
-                    s += translit[text[i]]
-                except KeyError:
-                    pass
-                i += 1
-
-        return s
-    
-    @staticmethod
-    def _from_arabic_to_translit(text):
-
-        text = text.replace('N', '').replace('Y', '').replace('W', '')
-
-        translit = {
-            chr(0x0626): chr(0x02bc), 
-            chr(0x0625): chr(0x02bc), 
-            chr(0x0623): chr(0x02bc), 
-            chr(0x0624): chr(0x02bc),
-            chr(0x0621): chr(0x02bc),
-            chr(0x064E) + chr(0x064E): 'aa', 
-            chr(0x0622): chr(0x02bc) + 'aa',
-            chr(0x064E) + chr(0x0627): 'aa',
-            chr(0x064E) + chr(0x0649): 'aa',
-            #chr(0x064E) + chr(0x0627): 'AA',
-            chr(0x0650) + chr(0x064A): 'ii',
-            chr(0x064F) + chr(0x0648): 'uu',
-            chr(0x064E): 'a',
-            chr(0x0650): 'i',
-            chr(0x064F): 'u',
-            chr(0x0639): 'ʻ',
-            chr(0x0628): 'b',
-            chr(0x062A): 't',
-            chr(0x062F): 'd',
-            chr(0x062C): 'ǧ',
-            chr(0x0631): 'r',
-            chr(0x062B): 'ṯ',
-            chr(0x0632): 'z',
-            chr(0x0633): 's',
-            chr(0x062D): 'ḥ',
-            chr(0x062E): 'ḫ',
-            chr(0x0630): 'ḏ',
-            chr(0x0635): 'ṣ',
-            chr(0x0634): 'š',
-            chr(0x0636): 'ḍ',
-            chr(0x0638): 'ẓ',
-            chr(0x0637): 'ṭ',
-            chr(0x063A): 'ġ',
-            chr(0x0641): 'f',
-            chr(0x0642): 'q',
-            chr(0x0643): 'k',
-            chr(0x0644): 'l',
-            #chr(0x0644): 'L',
-            chr(0x0645): 'm',
-            chr(0x0646): 'n',
-            chr(0x0647): 'h',
-            chr(0x0648): 'w',
-            chr(0x064A): 'y',
-            ' ': ' ',
-        }
-        a_rules = 'Lrqṣṭġḍḍḫ'
-        l_rules = 'uaALLAAh'
-
-        s = ''
-        i = 0
-
-        #we have letter 0627:
-        #  if at the very beginning of text, then: 0627 = 02bc + 064E
-
-
-        if text[0] == chr(0x0627):
-            s += chr(0x2bc) + chr(0x064E)
-            i += 1
-
-        while i < len(text):
-            if i < len(text) - 1 and text[i+1] == chr(0x0651):
-                s += 2*translit[text[i]]
-                i+=2 
-
-            if i < len(text) - 1:
-                if text[i-1] == ' ' and text[i] == chr(0x0627):
-                    s += ' '
-                    i += 1
-                
-            if text[i:i+2] in translit:
-                if i > 1 and translit.get(text[i-1], None) and translit[text[i-1]] in a_rules and \
-                        text[i] == chr(0x064E):
-                        s += 'A'
-                        i += 1
-                else:
-                    s += translit[text[i:i+2]]
-                    i += 2
-            else:
-                try:
-                    if i > 0 and text[i-1] == chr(0x064E) and text[i] == chr(0x0627):
-                        s += 'a'
-                    elif i > 0 and translit.get(text[i-1], None) and translit[text[i-1]] in a_rules and \
-                        text[i] == chr(0x064E):
-                        s += 'A'
-                    elif i > 0 and translit.get(text[i-1], None) and translit[text[i-1]] in l_rules and \
-                        text[i] == chr(0x0644):
-                        s += 'L'
-                    else:
-                        s += translit[text[i]]
-                except KeyError as err:
-                    print("KeyError", err)
-                i += 1
-
-            if s[-2:] == 'aA':
-                s = s.replace('aA', 'aa')
-            elif s[-2:] == 'Aa':
-                s = s.replace('Aa', 'AA')
-
-        return s 
     
     @staticmethod
     def suggest(cut, rhythm):
@@ -406,13 +143,13 @@ class WordView(View):
             for suggest in suggestions:
                 if suggest.next:
                     sort_data.append(suggest.next)
-                    res = WordView._from_translit_to_arabic(suggest.next)
+                    res = from_translit_to_arabic(suggest.next)
                     data.append(res)
 
         text = ' '.join(cut)
-        s_data = WordView.sort_by_frequency(data)
+        s_data = sort_by_frequency(data)
 
-        pattern = WordView.classify(text)
+        pattern = classify(text)
         
         n = len(pattern)
         print("R NAME", rhythm)
@@ -425,26 +162,21 @@ class WordView(View):
                 if len(d) == 1:
                     if next == 1 and n == len(r.pattern) - 1:
                         data.append(d)
-                elif WordView.classify(d) == next:
+                elif classify(d) == next:
                     data.append(d)
 
         return data
-    
-    @staticmethod
-    def sort_by_frequency(lst):
-        freq = Counter(lst)
-        return sorted(set(lst), key=lambda x: freq[x], reverse=True)
     
     @staticmethod
     def get_rhythms(text):
 
         rhythms = Rhythm.objects.all()
 
-        text = WordView._from_arabic_to_translit(text)
+        text = from_arabic_to_translit(text)
         print("TEXT", text)
         parts = WordView.split(text)
 
-        pattern = WordView.classify(parts)
+        pattern = classify(parts)
 
         n = len(pattern)
 
@@ -502,24 +234,7 @@ class WordView(View):
                 i += 1
         
         return s.strip()
-    
-    @staticmethod
-    def classify(text):
-        #print("CLASS 1", text)
-        text = text.split(' ')
-        #print("CLASS 2", text)
-        pattern = ''
-        for txt in text:
-            if len(txt) == 0:
-                continue
-            if len(txt) <= 2:
-                pattern += '1'
-            elif len(txt) == 3:
-                pattern += '2'
-            else:
-                pattern += '3'
 
-        return pattern
 
     """
     We need to write a new code for suggesting words in poerty composition. User types first word, so we have to continuously evaluate the Prosodic Metre of the typed text, and to know the Metre of the words before suggesting them. Therefore:
@@ -654,9 +369,9 @@ class WordView(View):
 
         S, M, L = WordView.get_S_M_L(text)
 
-        cut = WordView.split(WordView._from_arabic_to_translit(text))
+        cut = WordView.split(from_arabic_to_translit(text))
 
-        pattern = WordView.classify(cut)
+        pattern = classify(cut)
         print("WPATTERN", pattern)
         suggestions = []
         # do this for many rhythms
@@ -676,11 +391,11 @@ class WordView(View):
                     print("WWW", word)
                     SW, MW, LW = WordView.get_S_M_L(word.next)
                     print("SMLW", SW, MW, LW)
-                    ptr = WordView.classify(SW+MW)
+                    ptr = classify(SW+MW)
                     print("WWPAT", ptr)
                     if r.pattern.startswith(pattern+ptr):
                         print("IIF RHYTHMS")
-                        tr_word = WordView._from_arabic_to_translit(word.next)
+                        tr_word = from_arabic_to_translit(word.next)
                         print("TR WORD", tr_word)
                         if not is_vowel(tr_word[0]) and \
                             len(L) == 2 and \
@@ -692,7 +407,7 @@ class WordView(View):
                             print("SUG elif 1")
                             suggestions.append(word.next)
                         elif len(L) == 3 and not is_vowel(L[0]) and is_vowel(L[1]) and not is_vowel(L[2]):
-                            if WordView.classify(WordView.split(L + SW)) == '12':
+                            if classify(WordView.split(L + SW)) == '12':
                                 print("SUG elif 2") 
                                 suggestions.append(word.next)
 
@@ -700,7 +415,7 @@ class WordView(View):
 
     def get_S_M_L(text):
         text = WordView.apply_transformation_rules(text)
-        text = WordView._from_arabic_to_translit(text)
+        text = from_arabic_to_translit(text)
         S = ''
         M = ''
         L = ''
@@ -757,7 +472,7 @@ class WordView(View):
         """
     @staticmethod
     def is_rhythmable(text):
-        text = WordView._from_arabic_to_translit(text)
+        text = from_arabic_to_translit(text)
 
         if len(text) < 4:
             return False 
@@ -794,18 +509,19 @@ class WordView(View):
 
         return suggestions
 
+    """
     @staticmethod
     def new_line(text):
         text = WordView.apply_transformation_rules(text)
-        text = WordView._from_arabic_to_translit(text)
+        text = from_arabic_to_translit(text)
 
         cut = WordView.split(text)
 
         # pattern of text
-        pattern = WordView.classify(cut)
+        pattern = classify(cut)
 
         # pattern of last word
-        lp = WordView.classify(last)
+        lp = classify(last)
 
         # pattern without last word 
         rp = pattern[:-len(lp)]
@@ -813,12 +529,12 @@ class WordView(View):
         lines = []
         for rhyme in rhymes:
             line = ''
-            ptr = WordView.classify(rhyme.current + rhyme.next)
+            ptr = classify(rhyme.current + rhyme.next)
             if pattern.endswith(ptr):
                 line = rhyme.current + ' ' + rhyme.next
 
         return lines  
-
+    """
 
     """
     we need to work out the easy shrift typing, and suggestions for easy shrift (in full dots and diacritics)

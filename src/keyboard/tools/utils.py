@@ -1,5 +1,8 @@
 #
-from constants import Constants
+from collections import Counter
+
+#
+from .constants import Constants
 
 
 #
@@ -36,3 +39,7 @@ def is_vowel(letter):
     :returns: True or False
     """
     return letter in Constants.vowels
+
+def sort_by_frequency(lst):
+    freq = Counter(lst)
+    return sorted(set(lst), key=lambda x: freq[x], reverse=True)
