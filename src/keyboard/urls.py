@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
 
 from .api.rhythms import RhythmView
 from .api.koran import KoranView
@@ -25,19 +27,24 @@ from .api.translit_words import TranslitWordView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('rhythms/', RhythmView.as_view()),
-    path('koran/', KoranView.as_view()),
-    path('words/translit/remove/', TranslitWordView.remove),
-    path('words/', WordView.as_view()),
-    path('search/', WordView.search),
-    path('translit/', TranslitKoranView.as_view()),
-    path('split/', TranslitKoranView.split),
-    path('translit_words/', TranslitWordView.as_view()),
-    path('manage/pattern', TranslitWordView.manage_pattern),
-    path('easy_shrift', KoranView.easy_shrift),
-    path('word/easy_shrift', WordView.easy_shrift),
-    path('dots/', WordView.remove_dots),
-    path('words/remove', WordView.remove),
-    path('koran/remove', KoranView.remove),
-    path('koran/translit/remove', TranslitKoranView.remove)
+    path('api/rhythms/', RhythmView.as_view()),
+    path('api/koran/', KoranView.as_view()),
+    path('api/words/translit/remove/', TranslitWordView.remove),
+    path('api/words/', WordView.as_view()),
+    path('api/search/', WordView.search),
+    path('api/translit/', TranslitKoranView.as_view()),
+    path('api/split/', TranslitKoranView.split),
+    path('api/translit_words/', TranslitWordView.as_view()),
+    path('api/manage/pattern', TranslitWordView.manage_pattern),
+    path('api/easy_shrift', KoranView.easy_shrift),
+    path('api/word/easy_shrift', WordView.easy_shrift),
+    path('api/dots/', WordView.remove_dots),
+    path('api/words/remove', WordView.remove),
+    path('api/koran/remove', KoranView.remove),
+    path('api/koran/translit/remove', TranslitKoranView.remove)
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
