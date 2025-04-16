@@ -1,11 +1,8 @@
 import { KeyboardActions, KeyboardKey } from "../../interface";
-import { KEYBOARD_1 } from "../../util";
 import spacebar from "../../assets/spacebar.svg";
 import enter from "../../assets/enter.svg";
 import deleteLeft from "../../assets/delete-left.svg";
 import dot from "../../assets/dot-icon.png";
-import logo1 from "../../assets/logo/logo_1.jpg";
-import logo2 from "../../assets/logo/logo_2.jpg";
 import "./HexKeyButton.css";
 
 interface HexKeyButtonProps {

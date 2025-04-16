@@ -1,5 +1,5 @@
 export {
-  ArabicPhonemicTransformer,
+  arabicPhonemicTransformer,
   ARABIC_ORTHOGRAPHIC_RULES,
 } from "./transformation/transformation";
 export { DOT_TRANSFORMATIONS } from "./transformation/dot-transformation";

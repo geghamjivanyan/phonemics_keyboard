@@ -41,7 +41,6 @@
   left: -2px;
   width: calc(100% + 4px);
   height: calc(100% + 4px);
-  /*background: black;*/
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   z-index: -1;
 }

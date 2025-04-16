@@ -5,7 +5,7 @@ import {
   DOT_TRANSFORMATIONS,
   KEYBOARD_1,
   KEYBOARD_2,
-  ArabicPhonemicTransformer,
+  arabicPhonemicTransformer,
 } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
 import logo1 from "../../assets/logo/logo_1.jpg";
@@ -25,9 +25,9 @@ export const PhonemicKeyboard = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedRhythm, setSelectedRhythm] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const debouncedText: string = useDebounce<string>(typedText);
 
-  const transformedText = ArabicPhonemicTransformer(typedText);
+  const debouncedText: string = useDebounce<string>(typedText);
+  const transformedText = arabicPhonemicTransformer(typedText);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -42,7 +42,7 @@ export const PhonemicKeyboard = () => {
       return;
     }
 
-    const transformed = ArabicPhonemicTransformer(debouncedText);
+    const transformed = arabicPhonemicTransformer(debouncedText);
     setIsLoading(true);
     try {
       const response = await fetch("http://localhost:8000/search/", {
