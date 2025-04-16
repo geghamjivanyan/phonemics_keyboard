@@ -45,7 +45,7 @@ export const PhonemicKeyboard = () => {
     const transformed = ArabicPhonemicTransformer(debouncedText);
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/search/", {
+      const response = await fetch("http://34.16.40.142:8000/search/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
