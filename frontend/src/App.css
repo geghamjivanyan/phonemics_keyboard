@@ -1,3 +1,16 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .App {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
   text-align: center;
+
+  .header {
+    height: var(--page-header-height);
+  }
 }
