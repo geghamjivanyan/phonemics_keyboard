@@ -33,3 +33,14 @@
  2- also remove * from translit_koran
  3- if the last letter in Koran Arabic text is a diacritis (u+0650 or u+064F or u+064E) remove it
  4- if we have cvvc at the very end, it becomes cvv c (separating them) in translit_words and translit_koran
+
+
+  - U+0641 + (.) = U+0642
+  - U+0642 + (.) = U+06A4
+  - U+0629 + (.) = U+062B
+  - U+0635 + (.) = U+0636
+  - U+0639 + (.) = U+063A
+  - U+0643 + (.) = U+06AF
+  - U+0632 + (.) = U+0698
+  - U+062C + (.) = U+0686
+  - U+0634 + (.) = U+0686
