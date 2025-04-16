@@ -11,6 +11,7 @@ import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
 import logo1 from "../../assets/logo/logo_1.jpg";
 import logo2 from "../../assets/logo/logo_2.jpg";
 
+import { API_BASE_URL } from "../../config";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
@@ -45,7 +46,7 @@ export const PhonemicKeyboard = () => {
     const transformed = arabicPhonemicTransformer(debouncedText);
     setIsLoading(true);
     try {
-      const response = await fetch("http://34.16.40.142:8000/search/", {
+      const response = await fetch(`${API_BASE_URL}/search/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
