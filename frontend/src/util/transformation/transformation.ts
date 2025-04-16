@@ -7,8 +7,8 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
 
   { pattern: new RegExp(" ً", "u"), replace: " أَن" },
   { pattern: new RegExp(" ٌ", "u"), replace: " أُن" },
-  { pattern: new RegExp(" ٍ", "u"), replace:  " إِن" },
-  
+  { pattern: new RegExp(" ٍ", "u"), replace: " إِن" },
+
   { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
   { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
   { pattern: new RegExp(" ءِ", "u"), replace: " إِ" },
@@ -19,7 +19,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
 
   { pattern: new RegExp(" ُ", "u"), replace: " و" },
   { pattern: new RegExp(" ِ", "u"), replace: " ي" },
-  
+
   { pattern: new RegExp("الءَ", "u"), replace: "الأَ" },
   { pattern: new RegExp("الءُ", "u"), replace: "الأُ" },
   { pattern: new RegExp("يِ", "u"), replace: "يّ" },
@@ -58,53 +58,19 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("اءُ ", "u"), replace: "اءُ " },
   { pattern: new RegExp("اءِ ", "u"), replace: "اءِ " },
 
-
-
-
-
-
-
-
   // Double consonant transformations (e.g.,  ضض →  الضّ)
-  ...[
-    "ض",
-    "ص",
-    "ث",
-    "د",
-    "ش",
-    "س",
-    "ت",
-    "ن",
-    "ط",
-    "ر",
-    "ز",
-    "ظ",
-    "ذ",
-
-  ].map((letter) => ({
-    pattern: new RegExp(` ${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
-    replace: letter === "ل" ? ` الل` : ` ال${letter}ّ`,
-  })),
-  ...[
-
-    "ق",
-    "ف",
-    "غ",
-    "ع",
-    "ه",
-    "خ",
-    "ح",
-    "ج",
-    "ي",
-    "ب",
-    "ل",
-    "م",
-    "ك",
-    "و",
-  ].map((letter) => ({
-    pattern: new RegExp(`${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
-    replace: `${letter}ّ`,
-  })),
+  ...["ض", "ص", "ث", "د", "ش", "س", "ت", "ن", "ط", "ر", "ز", "ظ", "ذ"].map(
+    (letter) => ({
+      pattern: new RegExp(` ${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
+      replace: letter === "ل" ? ` الل` : ` ال${letter}ّ`,
+    }),
+  ),
+  ...["ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "ي", "ب", "ل", "م", "ك", "و"].map(
+    (letter) => ({
+      pattern: new RegExp(`${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
+      replace: `${letter}ّ`,
+    }),
+  ),
 
   // Prefix transformations with ل (e.g.,  لق →  الق)
   ...["ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "ي", "ب", "م", "ك", "ء", "و"].map(
@@ -173,7 +139,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
 
   { pattern: new RegExp("  ", "u"), replace: ", " },
   { pattern: new RegExp(",,", "u"), replace: ". " },
-  
+
   { pattern: new RegExp("اللَاه", "u"), replace: "اللّه" },
   { pattern: new RegExp("هَاأَنتُم", "u"), replace: "هَأَنتُم" },
   { pattern: new RegExp("هَاأَنَا", "u"), replace: "هَأَنَا" },
@@ -183,14 +149,14 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("هَاذَا", "u"), replace: "هَذَا" },
   { pattern: new RegExp("لَاكِن", "u"), replace: "لَكِن" },
   { pattern: new RegExp("إِلَاه", "u"), replace: "إِلَه" },
-  { pattern: new RegExp("الرَّحمَان", "u"), replace: "الرَّحمَن" }, 
+  { pattern: new RegExp("الرَّحمَان", "u"), replace: "الرَّحمَن" },
   { pattern: new RegExp("أُلِي", "u"), replace: "أُولِي" },
   { pattern: new RegExp("أُلُو", "u"), replace: "أُولُو" },
   { pattern: new RegExp("أُلَائِك", "u"), replace: "أُولَئِك" },
   { pattern: new RegExp("عَمرُ", "u"), replace: "عَمرو" },
 ];
 
-export function ArabicPhonemicTransformer(text: string): string {
+export function arabicPhonemicTransformer(text: string): string {
   let transformed = text;
   ARABIC_ORTHOGRAPHIC_RULES.forEach(({ pattern, replace }) => {
     const globalPattern = new RegExp(pattern.source, "gu");
