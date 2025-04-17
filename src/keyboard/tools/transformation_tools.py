@@ -85,3 +85,118 @@ def classify(text):
             pattern += '3'
 
     return pattern
+
+def split(res):
+        s = ''
+        i = 0
+
+        res = res.replace('L', 'l')
+        # arrange the case when text len is <= 4
+
+        if len(res) == 3:
+            if is_vowel(res[i]) and is_vowel(res[i+1]) and not is_vowel(res[i+2]):
+                return res[:2] + ' ' + res[2]
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] != res[i+1]):
+                    return res[0] + ' ' + res[1:]
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] == res[i+1]):
+                    return res
+            elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
+                return res[0] + ' ' + res[1:]
+            
+        res = res + '++'
+        while i < len(res)-2:
+            # after vv if vvc 
+            if is_vowel(res[i]) and is_vowel(res[i+1]) and not is_vowel(res[i+2]):
+                s += res[i:i+2] + ' '
+                i += 2
+            # after c1 if c1c2v and c1 != c2
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] != res[i+1]): 
+                    s += res[i] + ' '
+                    i += 1
+            # before c1 if c1c2v and c1 = c2
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
+                if not(is_vowel(res[2]) and res[i] == res[i+1]): 
+                    s += ' ' + res[i:i+2]
+                    i += 1 
+            # before c2 if v1c2v2 
+            elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
+                s += res[i] + ' '
+                i+=1 
+            else:
+                s += res[i]
+                i += 1
+        
+        return s.strip()
+
+def apply_transformation_rules(text):
+    
+        X = ["ث", "ص", "ض", "ن", "ت", "س", "ش", "ر", "ز", "د", "ذ", "ط", "ظ"]
+        C = ["ج", "ح", "خ", "ه", "ع", "غ", "ف", "ق", "ك", "م", "ل", "و", "ي", "ء"]
+
+        #  1 (ا) : (ءَ) +
+        if text[0] == "ا":
+            text = "ءَ" + text[1:]
+        
+        # 2 (ال) + X : (ءَ) + XX  +
+        for x in X:
+            term = "ال" + x
+            if text.startswith(term):
+                start = "ءَ" + x + x
+                text = start + text[len(term)]
+
+        mapping = {
+            "هَذا": "هَاذا",
+            "الرَّحْمَنِ": "ارْرَحْمَانِ",
+            "أُولَئِكَ": "أُلَائِكَ",
+            "هَؤُلَاء": "هَاؤُلَاء",
+            "سَمَوَات": "سَمَاوَات",
+            "الله": "اللاه",
+            "اللَه": "الْلاه",
+            "اللَّه": "الْلاه",
+            "لِلَّهِ": "لِلْلَاهِ",
+            "الَّذِي": "الْلَذِي",
+            "الَّذِينَ": "الْلَذِينَ",
+            "لِلَّذِي": "لِلْلَذِي"
+        }
+        # 3 (هؤلاء) and other words turned phonemic  +
+        for m in mapping:
+            if text.startswith(m):
+                text = mapping[m] + text[len(m):]
+
+        # 4 "ُوا" : "ُو"
+
+        if text.endswith("ُوا"):
+            text = text[:-len("ُوا")] + "ُو"
+
+        # 5 (a, A, u, i) + n
+        vowels = [chr(0x064E), chr(0x0650), chr(0x064F)]
+        for v in vowels:
+            if text.endswith(v + " "):
+                text = text[:-1] + chr(0x0646) + " "
+
+        # 
+
+        TR = {
+            "َ ا": "َ",
+            "َا ا": "َ",
+            "ُ ا": "ُ",
+            "ُوا ا": "ُ",
+            "ِ ا": "ِ",
+            "ِي ا": "ِ",
+            "َى ا": "َ"
+        }
+        # 9 Rule A: (“َ ا” = “َ”)، (“َا ا”=“َ”), (“ُ ا”=“ُ”), (“ُوا ا”=“ُ”), (“ِ ا”=“ِ”), (“ِي ا”=“ِ”), (“َى ا”=“َ”)
+        for a in TR:
+            text = text.replace(a, TR[a])
+
+        # 11 For the words A=(" فَ"، " وَكَ"، " كَ"، " فَكَ"،" كَبِ"، " وَ"،" فَوَ"، " وَبِ"، " بِ"، " أَبِ"، " فَبِ")
+        # (A) + (ال): (A) + (“ ”) + (ال)"
+        A = ["فَ", "وَكَ", "كَ", "فَكَ", "كَبِ", "وَ", "فَوَ", "وَبِ", "بِ", "أَبِ", "فَبِ"]
+
+        for a in A:
+            text = text.replace(a + "ال", a + " " + "ال")
+
+        return text
