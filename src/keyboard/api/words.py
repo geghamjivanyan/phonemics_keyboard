@@ -14,7 +14,7 @@ from ..models.rhythms import Rhythm
 from ..tools.utils import is_vowel, sort_by_frequency
 from ..tools.constants import Diacritics as D
 from ..tools.transformation_tools import from_arabic_to_translit, from_translit_to_arabic 
-from ..tools.transformation_tools import classify
+from ..tools.transformation_tools import classify, split
 
 
 class WordView(View):
@@ -115,7 +115,7 @@ class WordView(View):
             if arabic:
                 print("ARABIC", arabic)
                 if len(arabic) >= 3:
-                    cut = WordView.split(arabic)
+                    cut = split(arabic)
                 else:
                     cut = arabic
                 print("CUT", cut)
@@ -180,7 +180,7 @@ class WordView(View):
         rhythms = Rhythm.objects.all()
 
         text = from_arabic_to_translit(text)
-        parts = WordView.split(text)
+        parts = split(text)
         pattern = classify(parts)
         n = len(pattern)
 
@@ -196,7 +196,7 @@ class WordView(View):
 
         S, M, L = WordView.get_S_M_L(text)
 
-        cut = WordView.split(from_arabic_to_translit(text))
+        cut = split(from_arabic_to_translit(text))
 
         pattern = classify(cut)
         print("WPATTERN", pattern)
@@ -234,7 +234,7 @@ class WordView(View):
                             print("SUG elif 1")
                             suggestions.append(word.next)
                         elif len(L) == 3 and not is_vowel(L[0]) and is_vowel(L[1]) and not is_vowel(L[2]):
-                            if classify(WordView.split(L + SW)) == '12':
+                            if classify(split(L + SW)) == '12':
                                 print("SUG elif 2") 
                                 suggestions.append(word.next)
 
