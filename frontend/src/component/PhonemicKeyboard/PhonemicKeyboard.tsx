@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { CSSProperties, useState, useEffect } from "react";
 
 import { useDebounce } from "../../hook";
 import {
@@ -125,7 +125,7 @@ export const PhonemicKeyboard = () => {
           <div
             className="keyboard-row"
             key={rowIndex}
-            style={{ top: `${rowIndex * SPACE_BETWEEN_ROW + 2}px` }}
+            style={{ "--row-index": rowIndex } as CSSProperties}
           >
             {row.map((keyData: KeyboardKey) => (
               <HexKeyButton
