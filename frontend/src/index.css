@@ -1,8 +1,13 @@
 :root {
-  --hex-btn-size: 90px;
+  --page-header-height: 40px;
+
+  --keyboard-background: black;
   --space-between: 73px;
   --row-gap: 2px;
-  --keyboard-background: black;
+
+  --hex-btn-size: 90px;
+
+  --typed-text-height: 40px;
 }
 
 body {

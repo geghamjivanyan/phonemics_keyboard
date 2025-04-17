@@ -4,7 +4,7 @@ import { PhonemicKeyboard } from "./component/PhonemicKeyboard";
 function App() {
   return (
     <div className="App">
-      <h1>Phonemic Keyboard</h1>
+      <h1 className="header">Phonemic Keyboard</h1>
       <PhonemicKeyboard />
     </div>
   );
