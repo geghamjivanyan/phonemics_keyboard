@@ -22,12 +22,12 @@
   }
 
   .arabic {
-    font-size: calc(var(--hex-btn-size) * 0.4);
+    font-size: calc(var(--hex-btn-size) * 0.45);
   }
 
   .english {
     font-size: calc(var(--hex-btn-size) * 0.15);
-    margin: calc(var(--hex-btn-size) * 0.2) 0 0 0.5rem;
+    margin: calc(var(--hex-btn-size) * 0.35) 0 0 0.8rem;
   }
 
   .hex-img {
