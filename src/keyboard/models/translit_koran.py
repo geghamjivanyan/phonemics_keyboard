@@ -10,8 +10,8 @@ from django.contrib import admin
 class TranslitKoran(models.Model):
     chapter = models.CharField(max_length=3, null=True)
     block = models.CharField(max_length=3, null=True)
-    text = models.CharField(max_length=200, null=True)
-    cut_text = models.CharField(max_length=200, null=True, blank=True)
+    text = models.CharField(max_length=500, null=True)
+    cut_text = models.CharField(max_length=500, null=True, blank=True)
     pattern = models.CharField(max_length=50, null=True, blank=True)
 
 
