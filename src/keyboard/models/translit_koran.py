@@ -12,7 +12,7 @@ class TranslitKoran(models.Model):
     block = models.CharField(max_length=3, null=True)
     text = models.CharField(max_length=500, null=True)
     cut_text = models.CharField(max_length=500, null=True, blank=True)
-    pattern = models.CharField(max_length=50, null=True, blank=True)
+    pattern = models.CharField(max_length=100, null=True, blank=True)
 
 
     def __str__(self):
