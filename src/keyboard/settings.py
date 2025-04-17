@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
-#import environ
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-#env = environ.Env()
-#environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 STATIC_URL = '/static/'
@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'keyboard.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -113,6 +113,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+"""
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
