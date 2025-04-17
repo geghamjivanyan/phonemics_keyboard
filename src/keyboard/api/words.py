@@ -26,35 +26,42 @@ class WordView(View):
         for block in blocks:
             words = block.arabic.split(' ')
             if len(words) == 2:
-                Word.objects.get_or_create(
+                w = Word.objects.get_or_create(
                     current=words[0], 
-                    next=words[1],
-                    es_current=WordView.remove_dots(words[0]),
-                    es_next=WordView.remove_dots(words[1]), 
+                    next=words[1]
                 )
+                w.es_current=WordView.remove_dots(words[0])
+                w.es_next=WordView.remove_dots(words[1])
+                w.save()
             elif len(words) == 1:
-                Word.objects.get_or_create(
+                w = Word.objects.get_or_create(
                     current=words[0], 
                     next=None,
-                    es_current=WordView.remove_dots(words[0]),
-                    es_next=None
                 )
+                w.es_current=WordView.remove_dots(words[0])
+                w.es_next=None
+                w.save()
             else:
-                Word.objects.get_or_create(current=words[0], next=words[1])
+                w = Word.objects.get_or_create(current=words[0], next=words[1])
+                w.es_current=WordView.remove_dots(words[0])
+                w.es_next=WordView.remove_dots(words[1])
+                w.save()                
                 for i in range(1, len(words)-1, 1):
                     Word.objects.get_or_create(
                         current=words[i], 
                         next=words[i+1],
-                        es_current=WordView.remove_dots(words[0]),
-                        es_next=WordView.remove_dots(words[1]),
                     )
+                    w.es_current=WordView.remove_dots(words[i])
+                    w.es_next=WordView.remove_dots(words[i+1])
+                    w.save()
 
                 Word.objects.get_or_create(
                     current=words[-1], 
                     next=None,
-                    es_current=WordView.remove_dots(words[-1]),
-                    es_next=None    
                 )
+                w.es_current=WordView.remove_dots(words[-1]),
+                w.es_next=None    
+                w.save()
             
         return HttpResponse(
             status=200,
