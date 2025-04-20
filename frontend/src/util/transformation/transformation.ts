@@ -65,7 +65,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
       replace: letter === "ل" ? ` الل` : ` ال${letter}ّ`,
     }),
   ),
-  ...["ق", "ف", "غ", "ع", "ت", "ث", "د", "ذ", "ش", "ه", "خ", "ح", "ج", "س", "ص", "ط", "ظ", "ن", "", "ض", "ي", "ب", "ل", "م", "ك", "و"].map(
+  ...["ق", "ف", "غ", "ع", "ت", "ث", "د", "ذ", "ش", "ه", "خ", "ح", "ج", "س", "ص", "ط", "ظ", "ن", "ض", "ي", "ب", "ل", "م", "ك", "و"].map(
     (letter) => ({
       pattern: new RegExp(`${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
       replace: `${letter}ّ`,
@@ -73,7 +73,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   ),
 
   // Prefix transformations with ل (e.g.,  لق →  الق)
-  ...["ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "ي", "ب", "م", "ك", "ء", "و"].map(
+  ...["ق", "ف", "غ", "ل", "ع", "ه", "خ", "ح", "ج", "ي", "ب", "م", "ك", "ء", "و"].map(
     (letter) => ({
       pattern: new RegExp(` ل${escapeRegex(letter)}`, "u"),
       replace: ` ال${letter}`,
