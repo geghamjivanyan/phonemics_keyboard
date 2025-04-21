@@ -20,7 +20,7 @@ from ..tools.transformation_tools import classify, split
 class WordView(View):
 
     def get(self, request):
-        count = request.GET.get(count, None)
+        count = int(request.GET.get("count", None))
         blocks = Koran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
         count = len(blocks)
         j = 0
