@@ -20,46 +20,48 @@ from ..tools.transformation_tools import classify, split
 class WordView(View):
 
     def get(self, request):
-        blocks = Koran.objects.all()
+        count = request.GET.get(count, None)
+        blocks = Koran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
         count = len(blocks)
         j = 0
         for block in blocks:
             words = block.arabic.split(' ')
+            shrifts = block.easy_shrift.split(' ')
             if len(words) == 2:
                 w, _ = Word.objects.get_or_create(
                     current=words[0], 
                     next=words[1]
                 )
-                w.es_current=WordView.remove_dots(words[0])
-                w.es_next=WordView.remove_dots(words[1])
+                w.es_current=shrifts[0]
+                w.es_next=shrifts[1]
                 w.save()
             elif len(words) == 1:
                 w, _ = Word.objects.get_or_create(
                     current=words[0], 
                     next=None,
                 )
-                w.es_current=WordView.remove_dots(words[0])
+                w.es_current=shrifts[0]
                 w.es_next=None
                 w.save()
             else:
                 w, _ = Word.objects.get_or_create(current=words[0], next=words[1])
-                w.es_current=WordView.remove_dots(words[0])
-                w.es_next=WordView.remove_dots(words[1])
+                w.es_current=shrifts[0]
+                w.es_next=shrifts[1]
                 w.save()                
                 for i in range(1, len(words)-1, 1):
                     w, _ = Word.objects.get_or_create(
                         current=words[i], 
                         next=words[i+1],
                     )
-                    w.es_current=WordView.remove_dots(words[i])
-                    w.es_next=WordView.remove_dots(words[i+1])
+                    w.es_current=shrifts[i]
+                    w.es_next=shrifts[i+1]
                     w.save()
 
                 w, _ = Word.objects.get_or_create(
                     current=words[-1], 
                     next=None,
                 )
-                w.es_current=WordView.remove_dots(words[-1]),
+                w.es_current=shrifts[-1],
                 w.es_next=None    
                 w.save()
             
