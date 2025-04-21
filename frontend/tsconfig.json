@@ -16,9 +16,7 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "*": [
-        "node_modules/*"
-      ]
+      "*": ["node_modules/*"]
     }
   },
   "include": ["src", "src/**/*", "src/types/images.d.ts"]

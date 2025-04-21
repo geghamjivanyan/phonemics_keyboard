@@ -6,7 +6,7 @@ const RED = "#F0C8C8"; // (240,200,200) +
 const PURPLE = "#d397d3"; // (211 151 211)
 const GREEN = "#C8F0C8"; // (200,240,200) +
 const BLUE = "#C8D2FA"; // (200,210,250)
-const BLACK = '#000000';
+const BLACK = "#000000";
 
 // wrqpjihc  in yellow
 // tonmg    in purple

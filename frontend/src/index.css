@@ -1,25 +1,73 @@
-:root {
-  --page-header-height: 40px;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  --keyboard-background: black;
-  --space-between: 73px;
-  --row-gap: 2px;
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
 
-  --hex-btn-size: 90px;
-
-  --typed-text-height: 40px;
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+:root {
+  --page-header-height: 40px;
+
+  --keyboard-background: #000000;
+  --key-letter-color: #000000;
+
+  --hex-btn-size: 90px;
+  --space-between: 69px;
+  --row-gap: 2px;
+  --row-index: 0;
+
+  --typed-text-height: 40px;
+}
+
+@media (max-width: 1280px) {
+  :root {
+    --hex-btn-size: 80px;
+    --space-between: 63px;
+    --row-gap: 2px;
+  }
+}
+
+/* (tablet / small laptop)  */
+@media (max-width: 1024px) {
+  :root {
+    --hex-btn-size: 70px;
+    --space-between: 54px;
+    --row-gap: 1.5px;
+  }
+}
+
+/* (phones) */
+@media (max-width: 640px) {
+  :root {
+    --hex-btn-size: 56px;
+    --space-between: 44px;
+    --row-gap: 1px;
+  }
 }

@@ -5,13 +5,15 @@
   outline: none;
   font-size: 1rem;
   box-shadow: 0 0 0 2px black;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);  transition:
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: row;
+  color: var(--key-letter-color);
 
   &:hover {
     cursor: pointer;
@@ -20,13 +22,12 @@
   }
 
   .arabic {
-    font-size: 3rem;
-    font-weight: 500;
+    font-size: calc(var(--hex-btn-size) * 0.45);
   }
 
   .english {
-    font-size: 0.8rem;
-    margin: 1.5rem 0 0 1rem;
+    font-size: calc(var(--hex-btn-size) * 0.15);
+    margin: calc(var(--hex-btn-size) * 0.35) 0 0 0.8rem;
   }
 
   .hex-img {
