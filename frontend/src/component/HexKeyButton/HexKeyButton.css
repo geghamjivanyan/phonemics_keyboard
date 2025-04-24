@@ -1,19 +1,19 @@
 .hex-key-wrapper {
   width: var(--hex-btn-size);
   height: var(--hex-btn-size);
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  box-shadow: 0 0 0 2px black;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: row;
+  font-size: 1rem;
   color: var(--key-letter-color);
+  box-shadow: 0 0 0 2px black;
+  border: none;
+  outline: none;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 
   &:hover {
     cursor: pointer;
@@ -41,12 +41,12 @@
 }
 
 .hex-key-wrapper::before {
-  content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
   width: calc(100% + 4px);
   height: calc(100% + 4px);
+  content: "";
+  top: -2px;
+  left: -2px;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   z-index: -1;
 }
