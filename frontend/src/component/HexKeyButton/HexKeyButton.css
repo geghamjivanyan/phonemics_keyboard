@@ -32,7 +32,11 @@
 
   .hex-img {
     object-fit: contain;
+  }
+
+  .switch-label {
     font-weight: 500;
+    font-size: calc(var(--hex-btn-size) * 0.3);
   }
 }
 

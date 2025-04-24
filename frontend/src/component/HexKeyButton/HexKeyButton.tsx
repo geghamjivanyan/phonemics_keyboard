@@ -44,7 +44,7 @@ export const HexKeyButton = ({
     >
       {iconSrc ? (
         keyData.action === KeyboardActions.SWITCH_KEYBOARD ? (
-          <span className="hex-img">{iconSrc}</span>
+          <span className="switch-label">{iconSrc}</span>
         ) : (
           <img
             src={iconSrc}

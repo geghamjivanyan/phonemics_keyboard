@@ -14,6 +14,14 @@ import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
 
+const SWITCH_LABEL: Record<"k1" | "k2", string> = {
+  k1: "تشكيل",
+  k2: "إهمال",
+} as const;
+
+const getSwitchLabel = (kb: KeyboardKey[][]): string =>
+  kb === KEYBOARD_1 ? SWITCH_LABEL.k1 : SWITCH_LABEL.k2;
+
 export const PhonemicKeyboard = () => {
   const [transformedText, setTransformedText] = useState<string>("");
   const [activeKeyboard, setActiveKeyboard] =
@@ -58,7 +66,7 @@ export const PhonemicKeyboard = () => {
   }, [debouncedText, selectedRhythm]);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent): void => {
       if (e.key !== "Enter") return;
       handleEnter();
       e.preventDefault();
@@ -188,7 +196,7 @@ export const PhonemicKeyboard = () => {
               <HexKeyButton
                 key={keyData.id}
                 keyData={keyData}
-                switchLogo={activeKeyboard === KEYBOARD_1 ? "تشكيل" : "إهمال"}
+                switchLogo={getSwitchLabel(activeKeyboard)}
                 onClick={() => handleKeyClick(keyData)}
               />
             ))}
