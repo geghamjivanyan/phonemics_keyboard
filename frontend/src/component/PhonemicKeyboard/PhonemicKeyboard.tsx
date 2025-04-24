@@ -1,4 +1,4 @@
-import { CSSProperties, useState, useEffect } from "react";
+import { CSSProperties, useState, useEffect, useCallback } from "react";
 
 import { useDebounce } from "../../hook";
 import {
@@ -15,17 +15,42 @@ import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
 
 export const PhonemicKeyboard = () => {
-  const [typedText, setTypedText] = useState<string>("");
+  const [transformedText, setTransformedText] = useState<string>("");
   const [activeKeyboard, setActiveKeyboard] =
     useState<KeyboardKey[][]>(KEYBOARD_1);
   const [rhythms, setRhythms] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedRhythm, setSelectedRhythm] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [lastOperation, setLastOperation] = useState<{
+    type: "insert" | "delete" | "replace" | "transform" | "api";
+    data?: any;
+  } | null>(null);
 
-  const debouncedText: string = useDebounce<string>(typedText);
-  const transformedText = arabicPhonemicTransformer(typedText);
+  const debouncedText = useDebounce<string>(transformedText);
 
+  const applyTransformation = useCallback(() => {
+    // Skip transformation if the last operation was already a transformation or API update
+    if (lastOperation?.type === "transform" || lastOperation?.type === "api") {
+      return;
+    }
+
+    const newTransformedText = arabicPhonemicTransformer(transformedText);
+
+    if (newTransformedText !== transformedText) {
+      setTransformedText(newTransformedText);
+      setLastOperation({ type: "transform" });
+    }
+  }, [transformedText, lastOperation]);
+
+  useEffect(() => {
+    // Only apply transformations for insert and replace operations
+    if (lastOperation?.type === "insert" || lastOperation?.type === "replace") {
+      applyTransformation();
+    }
+  }, [lastOperation, applyTransformation]);
+
+  // Fetch suggestions when debounced text changes
   useEffect(() => {
     const controller = new AbortController();
     void fetchSuggestions(controller.signal);
@@ -39,7 +64,6 @@ export const PhonemicKeyboard = () => {
       return;
     }
 
-    const transformed = arabicPhonemicTransformer(debouncedText);
     setIsLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/search/`, {
@@ -47,14 +71,22 @@ export const PhonemicKeyboard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: transformed, rhythms: selectedRhythm }),
+        body: JSON.stringify({
+          text: debouncedText,
+          rhythms: selectedRhythm,
+        }),
         signal,
       });
 
       const responseData: SearchResponse = await response.json();
       setRhythms(responseData.data.rhythms || []);
       setSuggestions(responseData.data.suggestions || []);
-      setTypedText(responseData.data.text || "");
+
+      // Update transformed text only if API provides a different text
+      if (responseData.data.text && responseData.data.text !== debouncedText) {
+        setTransformedText(responseData.data.text);
+        setLastOperation({ type: "api", data: responseData.data.text });
+      }
     } catch (error: any) {
       console.error("Error fetching suggestions:", error);
     } finally {
@@ -63,7 +95,8 @@ export const PhonemicKeyboard = () => {
   };
 
   const handleSuggestionClick = (suggestion: string): void => {
-    setTypedText((prev: string) => prev + suggestion);
+    setTransformedText((prev: string) => prev + suggestion);
+    setLastOperation({ type: "insert", data: suggestion });
   };
 
   const handleRhythmClick = (rhythm: string): void => {
@@ -71,19 +104,27 @@ export const PhonemicKeyboard = () => {
   };
 
   const insertCharacter = (char: string): void => {
-    setTypedText((prev: string) => prev + char);
+    setTransformedText((prev: string) => prev + char);
+    setLastOperation({ type: "insert", data: char });
   };
 
   const handleDotInput = (): void => {
-    setTypedText((prev: string) => {
-      const lastChar = prev.slice(-1);
-      const replacement = DOT_TRANSFORMATIONS[lastChar];
-      return replacement ? prev.slice(0, -1) + replacement : prev + ".";
+    const last = transformedText.at(-1) ?? "";
+    const repl = DOT_TRANSFORMATIONS[last];
+
+    setTransformedText((prev) => {
+      return repl ? prev.slice(0, -1) + repl : prev + ".";
+    });
+
+    setLastOperation({
+      type: repl ? "replace" : "insert",
+      data: repl ? { original: last, replacement: repl } : ".",
     });
   };
 
   const deleteLastCharacter = (): void => {
-    setTypedText((prev: string) => prev.slice(0, -1));
+    setTransformedText((prev: string) => prev.slice(0, -1));
+    setLastOperation({ type: "delete" });
   };
 
   const handleKeyClick = (key: KeyboardKey): void => {
@@ -98,7 +139,7 @@ export const PhonemicKeyboard = () => {
         insertCharacter(key.arabic);
         break;
       case KeyboardActions.ENTER:
-        console.log("ENTER", typedText);
+        console.log("ENTER", transformedText);
         break;
       case KeyboardActions.SWITCH_KEYBOARD:
         switchKeyboard();
