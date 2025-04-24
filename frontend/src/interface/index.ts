@@ -21,5 +21,6 @@ export interface SearchResponse {
   data: {
     rhythms: string[];
     suggestions: string[];
+    text: string;
   };
 }

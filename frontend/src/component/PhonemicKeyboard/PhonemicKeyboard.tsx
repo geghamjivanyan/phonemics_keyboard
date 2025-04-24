@@ -8,15 +8,11 @@ import {
   arabicPhonemicTransformer,
 } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
-import logo1 from "../../assets/logo/logo_1.jpg";
-import logo2 from "../../assets/logo/logo_2.jpg";
 
 import { API_BASE_URL } from "../../config";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
-
-const SPACE_BETWEEN_ROW: number = 69;
 
 export const PhonemicKeyboard = () => {
   const [typedText, setTypedText] = useState<string>("");
@@ -55,9 +51,10 @@ export const PhonemicKeyboard = () => {
         signal,
       });
 
-      const data: SearchResponse = await response.json();
-      setRhythms(data.data.rhythms || []);
-      setSuggestions(data.data.suggestions || []);
+      const responseData: SearchResponse = await response.json();
+      setRhythms(responseData.data.rhythms || []);
+      setSuggestions(responseData.data.suggestions || []);
+      setTypedText(responseData.data.text || "");
     } catch (error: any) {
       console.error("Error fetching suggestions:", error);
     } finally {
@@ -131,7 +128,7 @@ export const PhonemicKeyboard = () => {
               <HexKeyButton
                 key={keyData.id}
                 keyData={keyData}
-                switchLogo={activeKeyboard === KEYBOARD_1 ? logo1 : logo2}
+                switchLogo={activeKeyboard === KEYBOARD_1 ? "تشكيل" : "إهمال"}
                 onClick={() => handleKeyClick(keyData)}
               />
             ))}

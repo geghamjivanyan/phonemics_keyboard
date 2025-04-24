@@ -32,6 +32,7 @@
 
   .hex-img {
     object-fit: contain;
+    font-weight: 500;
   }
 }
 

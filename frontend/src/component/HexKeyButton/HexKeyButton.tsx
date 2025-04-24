@@ -23,7 +23,7 @@ const getIconSrc = (
   switchLogo: string,
 ): string | undefined => {
   if (keyData.action === KeyboardActions.SWITCH_KEYBOARD) {
-    return switchLogo ? switchLogo : keyData.action;
+    return switchLogo;
   }
   return keyData.action ? ICONS[keyData.action] : undefined;
 };
@@ -43,13 +43,17 @@ export const HexKeyButton = ({
       onClick={onClick}
     >
       {iconSrc ? (
-        <img
-          src={iconSrc}
-          alt="Key icon"
-          width={40}
-          height={40}
-          className="hex-img"
-        />
+        keyData.action === KeyboardActions.SWITCH_KEYBOARD ? (
+          <span className="hex-img">{iconSrc}</span>
+        ) : (
+          <img
+            src={iconSrc}
+            alt="Key icon"
+            width={40}
+            height={40}
+            className="hex-img"
+          />
+        )
       ) : (
         <span className="arabic">{keyData.arabic}</span>
       )}
