@@ -57,6 +57,17 @@ export const PhonemicKeyboard = () => {
     return () => controller.abort();
   }, [debouncedText, selectedRhythm]);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Enter") return;
+      handleEnter();
+      e.preventDefault();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [suggestions, transformedText]);
+
   const fetchSuggestions = async (signal: AbortSignal): Promise<void> => {
     if (debouncedText.trim() === "") {
       setRhythms([]);
@@ -94,15 +105,6 @@ export const PhonemicKeyboard = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion: string): void => {
-    setTransformedText((prev: string) => prev + suggestion);
-    setLastOperation({ type: "insert", data: suggestion });
-  };
-
-  const handleRhythmClick = (rhythm: string): void => {
-    setSelectedRhythm(rhythm);
-  };
-
   const insertCharacter = (char: string): void => {
     setTransformedText((prev: string) => prev + char);
     setLastOperation({ type: "insert", data: char });
@@ -127,6 +129,23 @@ export const PhonemicKeyboard = () => {
     setLastOperation({ type: "delete" });
   };
 
+  const handleEnter = () => {
+    if (suggestions.length > 0) {
+      handleSuggestionClick(suggestions[0]);
+    } else {
+      console.log("ENTER", transformedText);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string): void => {
+    setTransformedText((prev: string) => prev + suggestion);
+    setLastOperation({ type: "insert", data: suggestion });
+  };
+
+  const handleRhythmClick = (rhythm: string): void => {
+    setSelectedRhythm(rhythm);
+  };
+
   const handleKeyClick = (key: KeyboardKey): void => {
     switch (key.action) {
       case KeyboardActions.DELETE:
@@ -139,7 +158,7 @@ export const PhonemicKeyboard = () => {
         insertCharacter(key.arabic);
         break;
       case KeyboardActions.ENTER:
-        console.log("ENTER", transformedText);
+        handleEnter();
         break;
       case KeyboardActions.SWITCH_KEYBOARD:
         switchKeyboard();
