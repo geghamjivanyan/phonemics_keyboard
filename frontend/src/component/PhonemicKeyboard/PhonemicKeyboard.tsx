@@ -1,5 +1,4 @@
 import { CSSProperties, useState, useEffect, useCallback } from "react";
-
 import { useDebounce } from "../../hook";
 import {
   DOT_TRANSFORMATIONS,
@@ -8,7 +7,6 @@ import {
   arabicPhonemicTransformer,
 } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
-
 import { API_BASE_URL } from "../../config";
 import { HexKeyButton } from "../HexKeyButton";
 import { TypedText } from "../TypedText";
@@ -22,8 +20,10 @@ const SWITCH_LABEL: Record<"k1" | "k2", string> = {
 const getSwitchLabel = (kb: KeyboardKey[][]): string =>
   kb === KEYBOARD_1 ? SWITCH_LABEL.k1 : SWITCH_LABEL.k2;
 
+const INITIAL_SPACE = " ";
+
 export const PhonemicKeyboard = () => {
-  const [transformedText, setTransformedText] = useState<string>("");
+  const [transformedText, setTransformedText] = useState<string>(INITIAL_SPACE);
   const [activeKeyboard, setActiveKeyboard] =
     useState<KeyboardKey[][]>(KEYBOARD_1);
   const [rhythms, setRhythms] = useState<string[]>([]);
@@ -87,9 +87,7 @@ export const PhonemicKeyboard = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/search/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: debouncedText,
           rhythms: selectedRhythm,
@@ -133,11 +131,13 @@ export const PhonemicKeyboard = () => {
   };
 
   const deleteLastCharacter = (): void => {
-    setTransformedText((prev: string) => prev.slice(0, -1));
+    setTransformedText((prev) =>
+      prev.length > INITIAL_SPACE.length ? prev.slice(0, -1) : INITIAL_SPACE,
+    );
     setLastOperation({ type: "delete" });
   };
 
-  const handleEnter = () => {
+  const handleEnter = (): void => {
     if (suggestions.length > 0) {
       handleSuggestionClick(suggestions[0]);
     } else {
@@ -177,10 +177,23 @@ export const PhonemicKeyboard = () => {
     }
   };
 
+  const postKeyboardMode = async (withDiacritics: boolean) => {
+    try {
+      await fetch(`${API_BASE_URL}/keyboard-mode`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ withDiacritics }),
+      });
+    } catch (err) {
+      console.error("Error sending keyboard mode:", err);
+    }
+  };
+
   const switchKeyboard = (): void => {
     setActiveKeyboard((prev: KeyboardKey[][]) =>
       prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
     );
+    void postKeyboardMode(activeKeyboard === KEYBOARD_1);
   };
 
   return (
