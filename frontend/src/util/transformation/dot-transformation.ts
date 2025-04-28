@@ -1,6 +1,7 @@
 export const DOT_TRANSFORMATIONS: Record<string, string> = {
 
-  // أ -> خ -> ج -> ح (4 dots cycle)
+  // أ -> إ -> ئ -> ؤ (5 dots cycle)
+  "\u0621": "\u0623", // ء -> أ (1st dot)
   "\u0623": "\u0625", // أ -> إ (1st dot)
   "\u0625": "\u0626", // إ -> ئ (2nd dot)
   "\u0626": "\u0624", // ئ -> ؤ (3rd dot)

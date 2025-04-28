@@ -99,14 +99,25 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp(" كَؤُ", "u"), replace: " كَأُ" },
   { pattern: new RegExp(" كَئِ", "u"), replace: " كَإِ" },
   { pattern: new RegExp("كَإِيب", "u"), replace: "كَئيب" },
-  { pattern: new RegExp(" وَكَؤُ", "u"), replace: " وَكَأُ" },
-  { pattern: new RegExp(" وَكَئِ", "u"), replace: " وَكَإِ" },
-  { pattern: new RegExp("وَكَؤُ", "u"), replace: "وَكَأُ" },
-  { pattern: new RegExp("وَكَئِ", "u"), replace: "وَكَإِ" },
-  { pattern: new RegExp("فَكَالؤُ", "u"), replace: "فَكَالأُ" },
-  { pattern: new RegExp("فَكَالئِ", "u"), replace: "فَكَالإِ" },
-  { pattern: new RegExp("وَكَالؤُ", "u"), replace: "وَكَالأُ" },
-  { pattern: new RegExp("وَكَالئِ", "u"), replace: "وَكَالإِ" },
+  { pattern: new RegExp(" وَؤُ", "u"), replace: " وَأُ" },
+  { pattern: new RegExp(" وَئِ", "u"), replace: " وَإِ" },
+  { pattern: new RegExp("بِئِ", "u"), replace: "بإِ" },
+  { pattern: new RegExp("بِئَ", "u"), replace: "بِأَ" },
+  { pattern: new RegExp("بِئُ", "u"), replace: "بِأُ" },
+  { pattern: new RegExp("الؤُ", "u"), replace: "الأُ" },
+  { pattern: new RegExp("الئِ", "u"), replace: "الإِ" },
+  { pattern: new RegExp("لِئِ", "u"), replace: "لِأَ" },
+  { pattern: new RegExp("لِئُ", "u"), replace: "لِأُ" },
+  { pattern: new RegExp("لِلئِ", "u"), replace: "لِلإِ" },
+  { pattern: new RegExp("لِلؤُ", "u"), replace: "لِلأُ" },
+
+
+  { pattern: new RegExp("لِئِ", "u"), replace: "لِإِ" },
+  { pattern: new RegExp("أَئِ", "u"), replace: "أَإِ" },
+  { pattern: new RegExp("أَؤُ", "u"), replace: "أَأُ" },
+
+  { pattern: new RegExp(" لَِ", "u"), replace: " لِا" },
+
 
   // Names and suffixes
   { pattern: new RegExp("عَبدَل", "u"), replace: "عَبدَال" },
