@@ -35,6 +35,7 @@ export const PhonemicKeyboard = () => {
     data?: any;
   } | null>(null);
 
+  const withDiacritics = activeKeyboard === KEYBOARD_1;
   const debouncedText = useDebounce<string>(transformedText);
 
   const applyTransformation = useCallback(() => {
@@ -63,7 +64,7 @@ export const PhonemicKeyboard = () => {
     const controller = new AbortController();
     void fetchSuggestions(controller.signal);
     return () => controller.abort();
-  }, [debouncedText, selectedRhythm]);
+  }, [debouncedText, selectedRhythm, withDiacritics]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -91,6 +92,7 @@ export const PhonemicKeyboard = () => {
         body: JSON.stringify({
           text: debouncedText,
           rhythms: selectedRhythm,
+          withDiacritics,
         }),
         signal,
       });
@@ -177,23 +179,10 @@ export const PhonemicKeyboard = () => {
     }
   };
 
-  const postKeyboardMode = async (withDiacritics: boolean) => {
-    try {
-      await fetch(`${API_BASE_URL}/keyboard-mode`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ withDiacritics }),
-      });
-    } catch (err) {
-      console.error("Error sending keyboard mode:", err);
-    }
-  };
-
   const switchKeyboard = (): void => {
     setActiveKeyboard((prev: KeyboardKey[][]) =>
       prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
     );
-    void postKeyboardMode(activeKeyboard === KEYBOARD_1);
   };
 
   return (
