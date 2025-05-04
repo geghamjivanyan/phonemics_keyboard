@@ -104,7 +104,7 @@ class WordView(View):
         keyboard = json.loads(request.body).get('keyboard')
         text = words
         mode = is_keyboard_changed(mode, text)
-        
+        is_hamza = False
         new_rhyms = None
         if keyboard == 2:
             data = WordView.manage_hamza(text, phonemic=False)
@@ -148,7 +148,8 @@ class WordView(View):
                         data = WordView.manage_hamza(words, phonemic=False)
                         if len(data) == 0 and keyboard == 1:
                             data = WordView.suggest_next_syllables(translits, rhythm, mode)
-                        
+            else:
+                is_hamza = True            
 
         rhythms = WordView.get_rhythms(text)
         if len(rhythms) and rhythm:
@@ -160,6 +161,7 @@ class WordView(View):
             "suggestions": data,
             "new_rhyms": new_rhyms,
             "text": text,
+            "is_hamza": is_hamza,
         }
 
         return HttpResponse(
