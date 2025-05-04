@@ -43,7 +43,6 @@ export const DOT_TRANSFORMATIONS: Record<string, string> = {
   "\u0641": "\u0642", // ف -> ق (odd dots)
   "\u0642": "\u0641", // ق -> ف (odd dots)
   "\u0627": "\u0649", // ا -> ا (odd dots)
-  "\u0621": "\u0621", // ء -> ء (odd dots)
 
   // ر -> ز -> ر -> ز -> ر (2-dot pattern)
   "\u0631": "\u0632", // ر -> ز (odd dots)

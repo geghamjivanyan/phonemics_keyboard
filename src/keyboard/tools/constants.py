@@ -113,6 +113,30 @@ class Diacritics:
       chr(0x0629).encode('utf-8'): chr(0x0647).encode('utf-8'),
     }
 
+class DiacriticsSymbols:
+    diacritics = [
+      chr(0x064F).encode('utf-8'),  
+      chr(0x064E).encode('utf-8'), 
+      chr(0x064D).encode('utf-8'), 
+      chr(0x064C).encode('utf-8'), 
+      chr(0x064B).encode('utf-8'),
+      chr(0x0651).encode('utf-8'), 
+      chr(0x0650).encode('utf-8'),
+      chr(0x0652).encode('utf-8'), 
+      chr(0x0628).encode('utf-8'),
+      chr(0x062A).encode('utf-8'),
+      chr(0x062B).encode('utf-8'),
+      chr(0x062C).encode('utf-8'),
+      chr(0x062E).encode('utf-8'),
+      chr(0x0630).encode('utf-8'),
+      chr(0x0632).encode('utf-8'),
+      chr(0x0634).encode('utf-8'),
+      chr(0x0636).encode('utf-8'),
+      chr(0x0638).encode('utf-8'),
+      chr(0x063A).encode('utf-8'),
+      chr(0x0629).encode('utf-8'),
+    ]
+
 class Translit:
 
   from_translit = {

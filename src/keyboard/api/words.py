@@ -10,11 +10,12 @@ from ..models.words import Word
 from ..models.koran import Koran
 from ..models.translit_words import TranslitWord
 from ..models.rhythms import Rhythm
+from ..models.hamza_words import HamzaWord
 
-from ..tools.utils import is_vowel, sort_by_frequency
+from ..tools.utils import is_vowel, sort_by_frequency, is_keyboard_changed
 from ..tools.constants import Diacritics as D
 from ..tools.transformation_tools import from_arabic_to_translit, from_translit_to_arabic 
-from ..tools.transformation_tools import classify, split
+from ..tools.transformation_tools import classify, split, apply_transformation_rules
 
 
 class WordView(View):
@@ -99,41 +100,66 @@ class WordView(View):
         print("DATA", json.loads(request.body))
         words = json.loads(request.body).get('text', None)
         rhythm = json.loads(request.body).get('rhythms', None)
+        mode = json.loads(request.body).get('withDiacritics', None)
+        keyboard = json.loads(request.body).get('keyboard')
         text = words
-        print("WORD", words)
+        mode = is_keyboard_changed(mode, text)
         
         new_rhyms = None
-        if words[-1] == " ":
-            
-            words = words.strip().split(' ')
+        if keyboard == 2:
+            data = WordView.manage_hamza(text, phonemic=False)
+        else:
+            print("AAAAAAAAAA")
+            data = WordView.manage_hamza(text)
+
+        if len(data) == 1:
+            text = data[0]
             data = []
-            data = WordView.suggest_next_word(words[-1], rhythm)
-            new_rhyms = WordView.suggest_new_line(words[-1])
-            print("SUGGESTED WORDS\n", data)
-            print("SUGGESTED rhyms\n", new_rhyms)
+
         else:
-            print("TRANSLIT")
-            arabic = from_arabic_to_translit(words)
-            if arabic:
-                print("ARABIC", arabic)
-                if len(arabic) >= 3:
-                    cut = split(arabic)
+            if len(data) == 0:
+                if words[-1] == " ":
+                    
+                    words = words.strip().split(' ')
+                    data = []
+                    
+                    new_rhyms = WordView.suggest_new_line(words[-1])
+                    if mode:
+                        data = WordView.manage_hamza(text)
+                    else:
+                        data = WordView.suggest_next_word(words[-1], rhythm)
+                    print("SUGGESTED WORDS\n", data)
+                    print("SUGGESTED rhyms\n", new_rhyms)
                 else:
-                    cut = arabic
-                print("CUT", cut)
+                    print("TRANSLIT")
+                    arabic = from_arabic_to_translit(words[1:])
+                    if arabic:
+                        print("ARABIC", arabic)
+                        if len(arabic) >= 3:
+                            cut = split(arabic)
+                        else:
+                            cut = arabic
+                        print("CUT", cut)
 
-                translits = cut.split(' ')
-                print("TRANSLIT", translits)
-                data = WordView.suggest(translits, rhythm)
+                        translits = cut.split(' ')
+                        print("TRANSLIT", translits)
+                        print("MODE", mode)
+                        
+                        data = WordView.manage_hamza(words, phonemic=False)
+                        if len(data) == 0 and keyboard == 1:
+                            data = WordView.suggest_next_syllables(translits, rhythm, mode)
+                        
 
-        if rhythm:
+        rhythms = WordView.get_rhythms(text)
+        if len(rhythms) and rhythm:
             rhythms = [rhythm]
-        else:
-            rhythms = WordView.get_rhythms(text)
+        
+
         data = {
             "rhythms": rhythms,
             "suggestions": data,
             "new_rhyms": new_rhyms,
+            "text": text,
         }
 
         return HttpResponse(
@@ -143,7 +169,7 @@ class WordView(View):
         )
     
     @staticmethod
-    def suggest(cut, rhythm):
+    def suggest_next_syllables(cut, rhythm, mode=False):
 
         data = []
         sort_data = []
@@ -243,7 +269,7 @@ class WordView(View):
         return suggestions
 
     def get_S_M_L(text):
-        text = WordView.apply_transformation_rules(text)
+        text = apply_transformation_rules(text)
         text = from_arabic_to_translit(text)
         S = ''
         M = ''
@@ -283,7 +309,7 @@ class WordView(View):
         text = from_arabic_to_translit(text)
 
         if len(text) < 4:
-            return False 
+            return False, 0 
         
         if is_vowel(text[-4]) and is_vowel(text[-3]) and not is_vowel(text[-2]) and is_vowel(text[-1]):
             return True, 4
@@ -317,11 +343,70 @@ class WordView(View):
 
         return suggestions
 
+    @staticmethod
+    def manage_hamza(text, phonemic=True):
 
-    """
-    we need to work out the easy shrift typing, and suggestions for easy shrift (in full dots and diacritics)
-    1- we type in easy shrift, get suggestions in full text
-    2- as we switch between easy shrift and phonemic keyboards, the same text changes between easy shrift and full text
-    if we do not have the word in full text, no suggestion is given
-    """
+        words = text.split(' ')
+        word = WordView.change_hamza(words[-1])
+        hmz = HamzaWord.objects.filter(hamza=word)
+        
+        data = []
+        for h in hmz:
+            if phonemic:
+                data.append(h.phonemic)
+            else:
+                data.append(h.easy_shrift)
+        
+        return list(set(data))
 
+    @staticmethod
+    def change_hamza(text):
+        hamzas = [chr(0x0625), chr(0x0624), chr(0x0623), chr(0x0626), chr(0x0621)]
+        for h in hamzas:
+            text = text.replace(h, chr(0x0621))
+
+        return text
+
+
+"""
+{ pattern: new RegExp(" كَالل", "u"), replace: " كَالل" },
+
+{ pattern: new RegExp(" الل", "u"), replace: " الل" },
+
+{ pattern: new RegExp(" فَالل", "u"), replace: " فَالل" },
+
+{ pattern: new RegExp(" بَِ", "u"), replace: " بِا" },
+{ pattern: new RegExp(" فَبَِ", "u"), replace: " فَبِا" },
+{ pattern: new RegExp(" وَبَِ", "u"), replace: " وَبِا" },
+
+{ pattern: new RegExp("يِ", "u"), replace: "يّ" },
+{ pattern: new RegExp("يِّ", "u"), replace: "يِّ" },
+{ pattern: new RegExp("يِّ", "u"), replace: "يِّى" },
+
+{ pattern: new RegExp("وُ", "u"), replace: "وّ" },
+{ pattern: new RegExp("وُّ", "u"), replace: "وُّ" },
+{ pattern: new RegExp("وُّ", "u"), replace: "وُّو" },
+
+{ pattern: new RegExp(" الُ", "u"), replace: " الو" },
+{ pattern: new RegExp(" الِ", "u"), replace: " الي" },
+{ pattern: new RegExp(" الءَ", "u"), replace: " الأَ" },
+
+{ pattern: new RegExp(" الءُ", "u"), replace: " الأُ" },
+{ pattern: new RegExp(" الءِ", "u"), replace: " الإِ" },
+{ pattern: new RegExp(" الل", "u"), replace: " الل" },
+
+
+{ pattern: new RegExp("َُ", "u"), replace: "َو" },
+{ pattern: new RegExp("َِ", "u"), replace: "َي" },
+{ pattern: new RegExp("َُ", "u"), replace: "وَ" },
+{ pattern: new RegExp("ُِ", "u"), replace: "وِ" },
+{ pattern: new RegExp("ُِ", "u"), replace: "ُيُ" },
+{ pattern: new RegExp("َِ", "u"), replace: "يَ" },
+
+{ pattern: new RegExp("َاُ", "u"), replace: "َاو" },
+{ pattern: new RegExp("َاِ", "u"), replace: "َاي" },
+{ pattern: new RegExp("ِيَ", "u"), replace: "ِيَ" },
+{ pattern: new RegExp("ِيُ", "u"), replace: "ِيُ" },
+{ pattern: new RegExp("ُوَ", "u"), replace: "ُوَ" },
+{ pattern: new RegExp("ُوِ", "u"), replace: "ُوِ" },
+"""

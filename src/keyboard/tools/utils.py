@@ -2,7 +2,7 @@
 from collections import Counter
 
 #
-from .constants import Constants
+from .constants import Constants, DiacriticsSymbols as DS
 
 
 #
@@ -43,3 +43,11 @@ def is_vowel(letter):
 def sort_by_frequency(lst):
     freq = Counter(lst)
     return sorted(set(lst), key=lambda x: freq[x], reverse=True)
+
+def is_phonemic(text):
+    return any(sym.decode('utf-8') in text for sym in DS.diacritics)
+
+def is_keyboard_changed(mode, text):
+    return  mode != is_phonemic(text)
+ 
+    

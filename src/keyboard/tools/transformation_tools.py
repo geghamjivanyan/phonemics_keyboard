@@ -62,6 +62,8 @@ def from_arabic_to_translit(text):
                         s += T.to_translit[text[i]]
                 except KeyError as err:
                     print("KeyError", err)
+                except IndexError as err:
+                    print("IndexError", err)
                 i += 1
 
             if s[-2:] == 'aA':

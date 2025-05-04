@@ -36,6 +36,8 @@ export const PhonemicKeyboard = () => {
   } | null>(null);
 
   const withDiacritics = activeKeyboard === KEYBOARD_1;
+  const keyboard = (activeKeyboard === KEYBOARD_1) ? 1 : 2;
+  
   const debouncedText = useDebounce<string>(transformedText);
 
   const applyTransformation = useCallback(() => {
@@ -64,7 +66,7 @@ export const PhonemicKeyboard = () => {
     const controller = new AbortController();
     void fetchSuggestions(controller.signal);
     return () => controller.abort();
-  }, [debouncedText, selectedRhythm, withDiacritics]);
+  }, [debouncedText, selectedRhythm, withDiacritics, keyboard]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -93,6 +95,7 @@ export const PhonemicKeyboard = () => {
           text: debouncedText,
           rhythms: selectedRhythm,
           withDiacritics,
+          keyboard,
         }),
         signal,
       });
