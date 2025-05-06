@@ -27,23 +27,23 @@ from .api.translit_words import TranslitWordView
 from .api.hamza_words import HamzaWordView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('rhythms/', RhythmView.as_view()),
-    path('koran/', KoranView.as_view()),
-    path('words/translit/remove/', TranslitWordView.remove),
-    path('words/', WordView.as_view()),
-    path('search/', WordView.search),
-    path('translit/', TranslitKoranView.as_view()),
-    path('split/', TranslitKoranView.split),
-    path('translit_words/', TranslitWordView.as_view()),
-    path('manage/pattern', TranslitWordView.manage_pattern),
-    path('easy_shrift', KoranView.easy_shrift),
-    path('dots/', WordView.remove_dots),
-    path('words/remove', WordView.remove),
-    path('koran/remove', KoranView.remove),
-    path('koran/translit/remove', TranslitKoranView.remove),
-    path('hamza', HamzaWordView.as_view()),
-    path('hamza/remove', HamzaWordView.remove)
+    path('api/admin/', admin.site.urls),
+    path('api/rhythms/', RhythmView.as_view()),
+    path('api/koran/', KoranView.as_view()),
+    path('api/words/translit/remove/', TranslitWordView.remove),
+    path('api/words/', WordView.as_view()),
+    path('api/search/', WordView.search),
+    path('api/translit/', TranslitKoranView.as_view()),
+    path('api/split/', TranslitKoranView.split),
+    path('api/translit_words/', TranslitWordView.as_view()),
+    path('api/manage/pattern', TranslitWordView.manage_pattern),
+    path('api/easy_shrift', KoranView.easy_shrift),
+    path('api/dots/', WordView.remove_dots),
+    path('api/words/remove', WordView.remove),
+    path('api/koran/remove', KoranView.remove),
+    path('api/koran/translit/remove', TranslitKoranView.remove),
+    path('api/hamza', HamzaWordView.as_view()),
+    path('api/hamza/remove', HamzaWordView.remove)
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
