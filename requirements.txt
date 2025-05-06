@@ -13,3 +13,4 @@ PyJWT
 requests==2.26.0
 redis
 beautifulsoup4==4.13.3
+psycopg2
