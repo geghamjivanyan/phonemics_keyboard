@@ -44,6 +44,8 @@ services:
       bash -c '
       python3 src/manage.py migrate &&
       python3 src/manage.py runserver 0.0.0.0:8000'
+    networks:
+      pgnet:
 
   frontend:
     image: frontend:latest
