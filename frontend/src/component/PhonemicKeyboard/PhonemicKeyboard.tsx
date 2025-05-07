@@ -122,6 +122,27 @@ export const PhonemicKeyboard = () => {
     setLastOperation({ type: "insert", data: char });
   };
 
+  const handleEnter = (): void => {
+    if (suggestions.length > 0) {
+      handleSuggestionClick(suggestions[0]);
+    } else {
+      console.log("ENTER", transformedText);
+    }
+  };
+
+  const deleteLastCharacter = (): void => {
+    setTransformedText((prev) =>
+      prev.length > INITIAL_SPACE.length ? prev.slice(0, -1) : INITIAL_SPACE,
+    );
+    setLastOperation({ type: "delete" });
+  };
+
+  const switchKeyboard = (): void => {
+    setActiveKeyboard((prev: KeyboardKey[][]) =>
+      prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
+    );
+  };
+
   const handleDotInput = (): void => {
     const last = transformedText.at(-1) ?? "";
     const repl = DOT_TRANSFORMATIONS[last];
@@ -134,27 +155,6 @@ export const PhonemicKeyboard = () => {
       type: repl ? "replace" : "insert",
       data: repl ? { original: last, replacement: repl } : ".",
     });
-  };
-
-  const deleteLastCharacter = (): void => {
-    setTransformedText((prev) =>
-      prev.length > INITIAL_SPACE.length ? prev.slice(0, -1) : INITIAL_SPACE,
-    );
-    setLastOperation({ type: "delete" });
-  };
-
-  const handleEnter = (): void => {
-    if (suggestions.length > 0) {
-      handleSuggestionClick(suggestions[0]);
-    } else {
-      console.log("ENTER", transformedText);
-    }
-  };
-
-  const switchKeyboard = (): void => {
-    setActiveKeyboard((prev: KeyboardKey[][]) =>
-      prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
-    );
   };
 
   const handleSuggestionClick = (suggestion: string): void => {
@@ -184,20 +184,20 @@ export const PhonemicKeyboard = () => {
 
   const handleKeyClick = (key: KeyboardKey): void => {
     switch (key.action) {
+      case KeyboardActions.ENTER:
+        handleEnter();
+        break;
       case KeyboardActions.DELETE:
         deleteLastCharacter();
-        break;
-      case KeyboardActions.DOT:
-        handleDotInput();
         break;
       case KeyboardActions.SPACE:
         insertCharacter(key.arabic);
         break;
-      case KeyboardActions.ENTER:
-        handleEnter();
-        break;
       case KeyboardActions.SWITCH_KEYBOARD:
         switchKeyboard();
+        break;
+      case KeyboardActions.DOT:
+        handleDotInput();
         break;
       default:
         insertCharacter(key.arabic);
