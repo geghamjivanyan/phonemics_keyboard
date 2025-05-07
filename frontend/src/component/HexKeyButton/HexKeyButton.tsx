@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { KeyboardActions, KeyboardKey } from "../../interface";
 import spacebar from "../../assets/spacebar.svg";
 import enter from "../../assets/enter.svg";
@@ -28,36 +29,33 @@ const getIconSrc = (
   return keyData.action ? ICONS[keyData.action] : undefined;
 };
 
-export const HexKeyButton = ({
-  keyData,
-  onClick,
-  switchLogo,
-}: HexKeyButtonProps) => {
-  const iconSrc = getIconSrc(keyData, switchLogo);
+export const HexKeyButton = memo(
+  ({ keyData, onClick, switchLogo }: HexKeyButtonProps) => {
+    const iconSrc = getIconSrc(keyData, switchLogo);
+    const isSwitchKey = keyData.action === KeyboardActions.SWITCH_KEYBOARD;
 
-  return (
-    <button
-      aria-label={`Key: ${keyData.arabic}`}
-      className="hex-key-wrapper"
-      style={{ backgroundColor: keyData.color }}
-      onClick={onClick}
-    >
-      {iconSrc ? (
-        keyData.action === KeyboardActions.SWITCH_KEYBOARD ? (
+    return (
+      <button
+        aria-label={`Key: ${keyData.arabic || keyData.action || "unknown"}`}
+        className="hex-key-wrapper"
+        style={{ backgroundColor: keyData.color }}
+        onClick={onClick}
+      >
+        {isSwitchKey ? (
           <span className="switch-label">{iconSrc}</span>
-        ) : (
+        ) : iconSrc ? (
           <img
             src={iconSrc}
-            alt="Key icon"
+            alt={`${keyData.action} icon`}
             width={40}
             height={40}
             className="hex-img"
           />
-        )
-      ) : (
-        <span className="arabic">{keyData.arabic}</span>
-      )}
-      <span className="english">{keyData.english}</span>
-    </button>
-  );
-};
+        ) : (
+          <span className="arabic">{keyData.arabic}</span>
+        )}
+        <span className="english">{keyData.english}</span>
+      </button>
+    );
+  },
+);

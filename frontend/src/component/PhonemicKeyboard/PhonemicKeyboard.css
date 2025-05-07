@@ -10,31 +10,3 @@
   box-sizing: border-box;
   background-color: #b4b596;
 }
-
-.keyboard {
-  width: calc(6 * (var(--hex-btn-size) + var(--row-gap)) + 46px);
-  height: calc(4 * (var(--space-between) + 3 * var(--row-gap)));
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  background-color: var(--keyboard-background);
-  padding-top: 2px;
-}
-
-.keyboard-row {
-  position: absolute;
-  display: flex;
-  gap: var(--row-gap);
-  top: calc(var(--row-index) * var(--space-between) + 2px);
-}
-
-.keyboard-row:nth-child(odd) {
-  margin-left: calc(var(--hex-btn-size) / 2 * -1);
-}
-
-.keyboard-row:nth-child(even) {
-  margin-left: calc(var(--hex-btn-size) / 2);
-}

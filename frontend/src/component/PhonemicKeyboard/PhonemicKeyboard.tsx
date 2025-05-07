@@ -1,4 +1,4 @@
-import { CSSProperties, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "../../hook";
 import {
   DOT_TRANSFORMATIONS,
@@ -8,17 +8,9 @@ import {
 } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
 import { API_BASE_URL } from "../../config";
-import { HexKeyButton } from "../HexKeyButton";
+import { Keyboard } from "../Keyboard";
 import { TypedText } from "../TypedText";
 import "./PhonemicKeyboard.css";
-
-const SWITCH_LABEL: Record<"k1" | "k2", string> = {
-  k1: "تشكيل",
-  k2: "إهمال",
-} as const;
-
-const getSwitchLabel = (kb: KeyboardKey[][]): string =>
-  kb === KEYBOARD_1 ? SWITCH_LABEL.k1 : SWITCH_LABEL.k2;
 
 const INITIAL_SPACE = " ";
 
@@ -207,25 +199,7 @@ export const PhonemicKeyboard = () => {
 
   return (
     <div className="keyboard-container">
-      <div className="keyboard">
-        {activeKeyboard.map((row: KeyboardKey[], rowIndex: number) => (
-          <div
-            className="keyboard-row"
-            key={rowIndex}
-            style={{ "--row-index": rowIndex } as CSSProperties}
-          >
-            {row.map((keyData: KeyboardKey) => (
-              <HexKeyButton
-                key={keyData.id}
-                keyData={keyData}
-                switchLogo={getSwitchLabel(activeKeyboard)}
-                onClick={() => handleKeyClick(keyData)}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-
+      <Keyboard activeKeyboard={activeKeyboard} onKeyClick={handleKeyClick} />
       <TypedText
         typedText={transformedText}
         rhythms={rhythms}
