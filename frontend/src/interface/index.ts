@@ -22,5 +22,6 @@ export interface SearchResponse {
     rhythms: string[];
     suggestions: string[];
     text: string;
+    isHamza: boolean;
   };
 }

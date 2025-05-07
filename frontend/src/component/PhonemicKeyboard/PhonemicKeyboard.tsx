@@ -30,14 +30,15 @@ export const PhonemicKeyboard = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedRhythm, setSelectedRhythm] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isHamza, setIsHamza] = useState<boolean>(false);
   const [lastOperation, setLastOperation] = useState<{
     type: "insert" | "delete" | "replace" | "transform" | "api";
     data?: any;
   } | null>(null);
 
   const withDiacritics = activeKeyboard === KEYBOARD_1;
-  const keyboard = (activeKeyboard === KEYBOARD_1) ? 1 : 2;
-  
+  const keyboard = activeKeyboard === KEYBOARD_1 ? 1 : 2;
+
   const debouncedText = useDebounce<string>(transformedText);
 
   const applyTransformation = useCallback(() => {
@@ -61,7 +62,6 @@ export const PhonemicKeyboard = () => {
     }
   }, [lastOperation, applyTransformation]);
 
-  // Fetch suggestions when debounced text changes
   useEffect(() => {
     const controller = new AbortController();
     void fetchSuggestions(controller.signal);
@@ -83,6 +83,7 @@ export const PhonemicKeyboard = () => {
     if (debouncedText.trim() === "") {
       setRhythms([]);
       setSuggestions([]);
+      setIsHamza(false);
       return;
     }
 
@@ -103,8 +104,8 @@ export const PhonemicKeyboard = () => {
       const responseData: SearchResponse = await response.json();
       setRhythms(responseData.data.rhythms || []);
       setSuggestions(responseData.data.suggestions || []);
+      setIsHamza(responseData.data.isHamza || false);
 
-      // Update transformed text only if API provides a different text
       if (responseData.data.text && responseData.data.text !== debouncedText) {
         setTransformedText(responseData.data.text);
         setLastOperation({ type: "api", data: responseData.data.text });
@@ -150,9 +151,31 @@ export const PhonemicKeyboard = () => {
     }
   };
 
+  const switchKeyboard = (): void => {
+    setActiveKeyboard((prev: KeyboardKey[][]) =>
+      prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
+    );
+  };
+
   const handleSuggestionClick = (suggestion: string): void => {
-    setTransformedText((prev: string) => prev + suggestion);
-    setLastOperation({ type: "insert", data: suggestion });
+    if (isHamza) {
+      setTransformedText((prev: string) => {
+        const trimmed = prev.trimEnd();
+        if (trimmed === "") return suggestion + " ";
+
+        const lastSpaceIndex = trimmed.lastIndexOf(" ");
+        const newText =
+          lastSpaceIndex === -1
+            ? suggestion + " "
+            : trimmed.substring(0, lastSpaceIndex + 1) + suggestion + " ";
+
+        return newText + prev.slice(trimmed.length);
+      });
+      setLastOperation({ type: "replace", data: suggestion });
+    } else {
+      setTransformedText((prev) => prev + suggestion);
+      setLastOperation({ type: "insert", data: suggestion });
+    }
   };
 
   const handleRhythmClick = (rhythm: string): void => {
@@ -180,12 +203,6 @@ export const PhonemicKeyboard = () => {
         insertCharacter(key.arabic);
         break;
     }
-  };
-
-  const switchKeyboard = (): void => {
-    setActiveKeyboard((prev: KeyboardKey[][]) =>
-      prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
-    );
   };
 
   return (
