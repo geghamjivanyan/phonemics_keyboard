@@ -66,25 +66,7 @@ class TranslitKoranView(View):
         return HttpResponse(
             status=200,
             content_type="application/json; charset=utf-8",
-        )
-
-    @staticmethod
-    def split(request):
-        blocks = TranslitKoran.objects.all()
-
-        for block in blocks[:10]:
-            text = block.text.replace('.', '')
-            res = TranslitKoranView.limit_consecutive_letters(text)
-            block.text = text
-            block.cut_text = res
-            block.pattern = TranslitKoranView.classify(res)
-
-            block.save()
-
-        return HttpResponse(
-            status=200,
-            content_type="application/json; charset=utf-8",
-        )     
+        )    
     
     @staticmethod
     def limit_consecutive_letters(text):

@@ -21,13 +21,13 @@ from ..tools.transformation_tools import classify, split, apply_transformation_r
 class WordView(View):
 
     def get(self, request):
-        count = int(request.GET.get("count", None))
-        blocks = Koran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
-        count = len(blocks)
-        j = 0
+        #count = int(request.GET.get("count", None))
+        blocks = Koran.objects.all() #filter(id__gt=count*600, id__lt=(count+1)*600-1)
+
         for block in blocks:
             words = block.arabic.split(' ')
             shrifts = block.easy_shrift.split(' ')
+
             if len(words) == 2:
                 w, _ = Word.objects.get_or_create(
                     current=words[0], 
@@ -48,7 +48,8 @@ class WordView(View):
                 w, _ = Word.objects.get_or_create(current=words[0], next=words[1])
                 w.es_current=shrifts[0]
                 w.es_next=shrifts[1]
-                w.save()                
+                w.save()
+                                
                 for i in range(1, len(words)-1, 1):
                     w, _ = Word.objects.get_or_create(
                         current=words[i], 
@@ -57,14 +58,15 @@ class WordView(View):
                     w.es_current=shrifts[i]
                     w.es_next=shrifts[i+1]
                     w.save()
-
+                
                 w, _ = Word.objects.get_or_create(
                     current=words[-1], 
                     next=None,
                 )
-                w.es_current=shrifts[-1],
+                w.es_current=shrifts[-1]
                 w.es_next=None    
                 w.save()
+                
             
         return HttpResponse(
             status=200,
@@ -97,11 +99,13 @@ class WordView(View):
 
     @staticmethod
     def search(request):
-        print("DATA", json.loads(request.body))
-        words = json.loads(request.body).get('text', None)
-        rhythm = json.loads(request.body).get('rhythms', None)
-        mode = json.loads(request.body).get('withDiacritics', None)
-        keyboard = json.loads(request.body).get('keyboard')
+
+        body = json.loads(request.body)
+        words = body.get('text', None)
+        rhythm = body.get('rhythms', None)
+        mode = body.get('withDiacritics', None)
+        keyboard = body.get('keyboard', None)
+        
         text = words
         mode = is_keyboard_changed(mode, text)
         is_hamza = False
@@ -109,7 +113,6 @@ class WordView(View):
         if keyboard == 2:
             data = WordView.manage_hamza(text, phonemic=False)
         else:
-            print("AAAAAAAAAA")
             data = WordView.manage_hamza(text)
 
         if len(data) == 1:
@@ -128,22 +131,15 @@ class WordView(View):
                         data = WordView.manage_hamza(text)
                     else:
                         data = WordView.suggest_next_word(words[-1], rhythm)
-                    print("SUGGESTED WORDS\n", data)
-                    print("SUGGESTED rhyms\n", new_rhyms)
                 else:
-                    print("TRANSLIT")
                     arabic = from_arabic_to_translit(words[1:])
                     if arabic:
-                        print("ARABIC", arabic)
                         if len(arabic) >= 3:
                             cut = split(arabic)
                         else:
                             cut = arabic
-                        print("CUT", cut)
 
                         translits = cut.split(' ')
-                        print("TRANSLIT", translits)
-                        print("MODE", mode)
                         
                         data = WordView.manage_hamza(words, phonemic=False)
                         if len(data) == 0 and keyboard == 1:

@@ -20,13 +20,9 @@ class HamzaWordView(View):
     def get(self, request):
 
         hamzas = [chr(0x0625), chr(0x0624), chr(0x0623), chr(0x0626), chr(0x0621)]
-        count = request.GET.get("count", None)
-        if count:
-            count = int(count)
-            blocks = Koran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
-        else:
-            blocks = Koran.objects.all()
-        j = 0
+
+        blocks = Koran.objects.all()
+    
         for block in blocks:
             words = block.arabic.split(' ')
             for word in words:

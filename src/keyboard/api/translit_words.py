@@ -134,28 +134,6 @@ class TranslitWordView(View):
             return '2'
         return '3'        
 
-
-    @staticmethod
-    def manage_pattern(request):
-        words = TranslitWord.objects.all()
-
-        i = 0
-        for word in words:
-            if i % 100 == 0:
-                print("I", i)
-
-            pattern = TranslitWordView.classify(word.prev)
-            if word.current:
-                pattern += TranslitWordView.classify(word.current)
-            if word.next:
-                pattern += TranslitWordView.classify(word.next)
-            word.pattern = pattern
-            word.save()
-            i+=1
-        return HttpResponse(
-            status=200,
-            content_type="application/json; charset=utf-8",
-        )
     
     @staticmethod
     def remove(request):
