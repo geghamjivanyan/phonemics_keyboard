@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useDebounce } from "../../hook";
 import { DOT_TRANSFORMATIONS, arabicPhonemicTransformer } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
@@ -24,6 +24,7 @@ export const PhonemicKeyboard = () => {
   const [keyboardVersion, setKeyboardVersion] = useState<KeyboardVersion>(
     KeyboardVersion.One,
   );
+  const keyboardSwitchPendingRef = useRef(keyboardVersion);
 
   const debouncedText = useDebounce<string>(transformedText);
   const applyTransformation = useCallback(() => {
@@ -74,6 +75,10 @@ export const PhonemicKeyboard = () => {
 
     setIsLoading(true);
     try {
+      const hasKeyboardChanged =
+        keyboardSwitchPendingRef.current !== keyboardVersion;
+      keyboardSwitchPendingRef.current = keyboardVersion;
+
       const response = await fetch(`${API_BASE_URL}/search/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,6 +86,7 @@ export const PhonemicKeyboard = () => {
           text: debouncedText,
           rhythms: selectedRhythm,
           keyboard: keyboardVersion,
+          keyboardChanged: hasKeyboardChanged,
         }),
         signal,
       });
