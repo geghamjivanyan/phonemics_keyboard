@@ -1,12 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "../../hook";
-import {
-  DOT_TRANSFORMATIONS,
-  KEYBOARD_1,
-  KEYBOARD_2,
-  arabicPhonemicTransformer,
-} from "../../util";
+import { DOT_TRANSFORMATIONS, arabicPhonemicTransformer } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
+import { KeyboardVersion } from "../../constant";
 import { API_BASE_URL } from "../../config";
 import { Keyboard } from "../Keyboard";
 import { TypedText } from "../TypedText";
@@ -16,8 +12,6 @@ const INITIAL_SPACE = " ";
 
 export const PhonemicKeyboard = () => {
   const [transformedText, setTransformedText] = useState<string>(INITIAL_SPACE);
-  const [activeKeyboard, setActiveKeyboard] =
-    useState<KeyboardKey[][]>(KEYBOARD_1);
   const [rhythms, setRhythms] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedRhythm, setSelectedRhythm] = useState<string>();
@@ -27,12 +21,11 @@ export const PhonemicKeyboard = () => {
     type: "insert" | "delete" | "replace" | "transform" | "api";
     data?: any;
   } | null>(null);
-
-  const withDiacritics = activeKeyboard === KEYBOARD_1;
-  const keyboard = activeKeyboard === KEYBOARD_1 ? 1 : 2;
+  const [keyboardVersion, setKeyboardVersion] = useState<KeyboardVersion>(
+    KeyboardVersion.One,
+  );
 
   const debouncedText = useDebounce<string>(transformedText);
-
   const applyTransformation = useCallback(() => {
     // Skip transformation if the last operation was already a transformation or API update
     if (lastOperation?.type === "transform" || lastOperation?.type === "api") {
@@ -58,7 +51,7 @@ export const PhonemicKeyboard = () => {
     const controller = new AbortController();
     void fetchSuggestions(controller.signal);
     return () => controller.abort();
-  }, [debouncedText, selectedRhythm, withDiacritics, keyboard]);
+  }, [debouncedText, selectedRhythm, keyboardVersion]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -87,8 +80,7 @@ export const PhonemicKeyboard = () => {
         body: JSON.stringify({
           text: debouncedText,
           rhythms: selectedRhythm,
-          withDiacritics,
-          keyboard,
+          keyboard: keyboardVersion,
         }),
         signal,
       });
@@ -130,8 +122,8 @@ export const PhonemicKeyboard = () => {
   };
 
   const switchKeyboard = (): void => {
-    setActiveKeyboard((prev: KeyboardKey[][]) =>
-      prev === KEYBOARD_1 ? KEYBOARD_2 : KEYBOARD_1,
+    setKeyboardVersion((v) =>
+      v === KeyboardVersion.One ? KeyboardVersion.Two : KeyboardVersion.One,
     );
   };
 
@@ -199,7 +191,7 @@ export const PhonemicKeyboard = () => {
 
   return (
     <div className="keyboard-container">
-      <Keyboard activeKeyboard={activeKeyboard} onKeyClick={handleKeyClick} />
+      <Keyboard version={keyboardVersion} onKeyClick={handleKeyClick} />
       <TypedText
         typedText={transformedText}
         rhythms={rhythms}
