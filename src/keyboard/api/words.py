@@ -21,8 +21,8 @@ from ..tools.transformation_tools import classify, split, apply_transformation_r
 class WordView(View):
 
     def get(self, request):
-        #count = int(request.GET.get("count", None))
-        blocks = Koran.objects.all() #filter(id__gt=count*600, id__lt=(count+1)*600-1)
+        count = int(request.GET.get("count", None))
+        blocks = Koran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
 
         for block in blocks:
             words = block.arabic.split(' ')
@@ -39,7 +39,7 @@ class WordView(View):
             elif len(words) == 1:
                 w, _ = Word.objects.get_or_create(
                     current=words[0], 
-                    next=None,
+                    next=None
                 )
                 w.es_current=shrifts[0]
                 w.es_next=None
@@ -53,7 +53,7 @@ class WordView(View):
                 for i in range(1, len(words)-1, 1):
                     w, _ = Word.objects.get_or_create(
                         current=words[i], 
-                        next=words[i+1],
+                        next=words[i+1]
                     )
                     w.es_current=shrifts[i]
                     w.es_next=shrifts[i+1]
@@ -61,7 +61,7 @@ class WordView(View):
                 
                 w, _ = Word.objects.get_or_create(
                     current=words[-1], 
-                    next=None,
+                    next=None
                 )
                 w.es_current=shrifts[-1]
                 w.es_next=None    
