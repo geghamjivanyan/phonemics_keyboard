@@ -33,7 +33,8 @@ def is_vowel(letter):
 class TranslitWordView(View):
 
     def get(self, request):
-        blocks = TranslitKoran.objects.all()
+        count = int(request.GET.get("count", None))
+        blocks = TranslitKoran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
         i = 0
         for block in blocks:
             if i % 100 == 0:
@@ -41,7 +42,6 @@ class TranslitWordView(View):
             i+=1
             words = block.cut_text.split(' ')
 
-            #words = ['aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh']
             if len(words) == 2:
                 pattern="{}{}".format(
                     self.classify(words[0]), 
