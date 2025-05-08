@@ -13,17 +13,16 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 
 from ..models.rhythms import Rhythm
-
+from ..tools.constants import Rhythm as R
 
 class RhythmView(View):
     def get(self, request):
 
-        rhythms = Rhythm.objects.all()
+        for k, v in R.rhythms.items():
+            r = Rhythm(name=v, pattern=k)
+            r.save()
 
-        data = [r.to_dict() for r in rhythms]
-        print("SETTINGS", settings.DATA_UPLOAD_MAX_NUMBER_FIELDS)
         return HttpResponse(
-            json.dumps({"data": data}),
             status=200,
             content_type="application/json; charset=utf-8",
         )

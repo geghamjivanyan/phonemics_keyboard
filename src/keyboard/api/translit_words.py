@@ -141,6 +141,8 @@ class TranslitWordView(View):
         for obj in objs:
             obj.delete()
 
+        return HttpResponse("OK")
+
     @staticmethod
     def split(res):
         s = ''
