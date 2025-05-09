@@ -1,3 +1,5 @@
+import type { KeyboardKey } from "../../interface";
+
 const WHITE = "#FAFAFA"; // (250,250,250)
 const YELLOW = "#E6E6B4"; // (230,230,180)
 const RED = "#F0C8C8"; // (240,200,200)
@@ -5,7 +7,7 @@ const VIOLET = "#DCC8DC"; // (220,200,220)
 const GREEN = "#C8F0C8"; // (200,240,200)
 const BLUE = "#C8D2FA"; // (200,210,250)
 
-export const KEYS: Array<Array<any>> = [
+export const KEYS: Array<Array<KeyboardKey>> = [
   [
     { id: 1, english: "a", arabic: "\u066d", color: VIOLET },
     { id: 2, english: "b", arabic: "\u0641", color: VIOLET },
@@ -48,7 +50,7 @@ export const KEYS: Array<Array<any>> = [
   ],
 ];
 
-export const OLD_KEYS: Array<Array<any>> = [
+export const OLD_KEYS: Array<Array<KeyboardKey>> = [
   [
     { id: 1, english: "a", arabic: "\u064e", color: VIOLET },
     { id: 2, english: "b", arabic: "\u064f", color: VIOLET },

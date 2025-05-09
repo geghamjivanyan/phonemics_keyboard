@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useDebounce } from "../../hook";
-import { DOT_TRANSFORMATIONS, arabicPhonemicTransformer } from "../../util";
-import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
+import { API_BASE_URL } from "../../../../config/config.ts";
+import { useDebounce } from "../../hooks";
+import { DOT_TRANSFORMATIONS, arabicPhonemicTransformer } from "../../utils";
+import {
+  KeyboardActions,
+  type KeyboardKey,
+  type SearchResponse,
+} from "../../interface";
 import { KeyboardVersion } from "../../constant";
-import { API_BASE_URL } from "../../config";
-import { Keyboard } from "../../component/keyboard";
-import { TypedText } from "../../component/typed-text";
+import { Keyboard } from "../../components/keyboard";
+import { TypedText } from "../../components/typed-text";
 import "./PhonemicKeyboard.css";
 
 const INITIAL_SPACE = " ";
@@ -19,7 +23,7 @@ export const PhonemicKeyboard = () => {
   const [isHamza, setIsHamza] = useState<boolean>(false);
   const [lastOperation, setLastOperation] = useState<{
     type: "insert" | "delete" | "replace" | "transform" | "api";
-    data?: any;
+    data?: unknown;
   } | null>(null);
   const [keyboardVersion, setKeyboardVersion] = useState<KeyboardVersion>(
     KeyboardVersion.One,
@@ -100,7 +104,7 @@ export const PhonemicKeyboard = () => {
         setTransformedText(responseData.data.text);
         setLastOperation({ type: "api", data: responseData.data.text });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching suggestions:", error);
     } finally {
       setIsLoading(false);

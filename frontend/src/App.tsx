@@ -1,9 +1,9 @@
+import { PhonemicKeyboard } from "./features/phonemic-keyboard/pages/phonemic-keyboard";
 import "./App.css";
-import { PhonemicKeyboard } from "./pages/phonemic-keyboard";
 
 function App() {
   return (
-    <div className="App">
+    <div className={"App"}>
       <h1 className="header">Phonemic Keyboard</h1>
       <PhonemicKeyboard />
     </div>

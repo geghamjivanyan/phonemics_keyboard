@@ -65,20 +65,58 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
       replace: letter === "ل" ? ` الل` : ` ال${letter}ّ`,
     }),
   ),
-  ...["ق", "ف", "غ", "ع", "ت", "ث", "د", "ذ", "ش", "ه", "خ", "ح", "ج", "س", "ص", "ط", "ظ", "ن", "ض", "ي", "ب", "ل", "م", "ك", "و"].map(
-    (letter) => ({
-      pattern: new RegExp(`${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
-      replace: `${letter}ّ`,
-    }),
-  ),
+  ...[
+    "ق",
+    "ف",
+    "غ",
+    "ع",
+    "ت",
+    "ث",
+    "د",
+    "ذ",
+    "ش",
+    "ه",
+    "خ",
+    "ح",
+    "ج",
+    "س",
+    "ص",
+    "ط",
+    "ظ",
+    "ن",
+    "ض",
+    "ي",
+    "ب",
+    "ل",
+    "م",
+    "ك",
+    "و",
+  ].map((letter) => ({
+    pattern: new RegExp(`${escapeRegex(letter)}${escapeRegex(letter)}`, "u"),
+    replace: `${letter}ّ`,
+  })),
 
   // Prefix transformations with ل (e.g.,  لق →  الق)
-  ...["ق", "ف", "غ", "ل", "ع", "ه", "خ", "ح", "ج", "ي", "ب", "م", "ك", "ء", "و"].map(
-    (letter) => ({
-      pattern: new RegExp(` ل${escapeRegex(letter)}`, "u"),
-      replace: ` ال${letter}`,
-    }),
-  ),
+  ...[
+    "ق",
+    "ف",
+    "غ",
+    "ل",
+    "ع",
+    "ه",
+    "خ",
+    "ح",
+    "ج",
+    "ي",
+    "ب",
+    "م",
+    "ك",
+    "ء",
+    "و",
+  ].map((letter) => ({
+    pattern: new RegExp(` ل${escapeRegex(letter)}`, "u"),
+    replace: ` ال${letter}`,
+  })),
 
   // Hamza transformations (reordered)
   { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
@@ -111,13 +149,11 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("لِلئِ", "u"), replace: "لِلإِ" },
   { pattern: new RegExp("لِلؤُ", "u"), replace: "لِلأُ" },
 
-
   { pattern: new RegExp("لِئِ", "u"), replace: "لِإِ" },
   { pattern: new RegExp("أَئِ", "u"), replace: "أَإِ" },
   { pattern: new RegExp("أَؤُ", "u"), replace: "أَأُ" },
 
   { pattern: new RegExp(" لَِ", "u"), replace: " لِا" },
-
 
   // Names and suffixes
   { pattern: new RegExp("عَبدَل", "u"), replace: "عَبدَال" },
