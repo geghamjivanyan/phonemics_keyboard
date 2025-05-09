@@ -4,8 +4,8 @@ import { DOT_TRANSFORMATIONS, arabicPhonemicTransformer } from "../../util";
 import { KeyboardActions, KeyboardKey, SearchResponse } from "../../interface";
 import { KeyboardVersion } from "../../constant";
 import { API_BASE_URL } from "../../config";
-import { Keyboard } from "../Keyboard";
-import { TypedText } from "../TypedText";
+import { Keyboard } from "../../component/keyboard";
+import { TypedText } from "../../component/typed-text";
 import "./PhonemicKeyboard.css";
 
 const INITIAL_SPACE = " ";

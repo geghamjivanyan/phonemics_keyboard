@@ -2,7 +2,7 @@ import React, { CSSProperties, memo } from "react";
 import { KEYBOARD_1, KEYBOARD_2 } from "../../util";
 import { KeyboardKey } from "../../interface";
 import { KeyboardVersion } from "../../constant";
-import { HexKeyButton } from "../HexKeyButton";
+import { HexKeyButton } from "../hex-key-button";
 import "./Keyboard.css";
 
 interface KeyboardProps {
