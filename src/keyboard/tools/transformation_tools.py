@@ -96,14 +96,18 @@ def split(res):
         # arrange the case when text len is <= 4
 
         if len(res) == 3:
+            #vvc
             if is_vowel(res[i]) and is_vowel(res[i+1]) and not is_vowel(res[i+2]):
                 return res[:2] + ' ' + res[2]
+            #c1c2v
             elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
                 if not(is_vowel(res[2]) and res[i] != res[i+1]):
                     return res[0] + ' ' + res[1:]
+            #c1c2c3
             elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
                 if not(is_vowel(res[2]) and res[i] == res[i+1]):
                     return res
+            # vcv
             elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
                 return res[0] + ' ' + res[1:]
             
@@ -114,15 +118,13 @@ def split(res):
                 s += res[i:i+2] + ' '
                 i += 2
             # after c1 if c1c2v and c1 != c2
-            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
-                if not(is_vowel(res[2]) and res[i] != res[i+1]): 
-                    s += res[i] + ' '
-                    i += 1
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]) and res[i] != res[i+1]:
+                s += res[i] + ' '
+                i += 1
             # before c1 if c1c2v and c1 = c2
-            elif not is_vowel(res[i]) and not is_vowel(res[i+1]):
-                if not(is_vowel(res[2]) and res[i] == res[i+1]): 
-                    s += ' ' + res[i:i+2]
-                    i += 1 
+            elif not is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]) and res[i] == res[i+1]:
+                s += ' ' + res[i:i+2]
+                i += 2
             # before c2 if v1c2v2 
             elif is_vowel(res[i]) and not is_vowel(res[i+1]) and is_vowel(res[i+2]):
                 s += res[i] + ' '

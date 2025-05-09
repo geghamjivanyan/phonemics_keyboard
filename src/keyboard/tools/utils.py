@@ -49,5 +49,20 @@ def is_phonemic(text):
 
 def is_keyboard_changed(mode, text):
     return  mode != is_phonemic(text)
+
+
+def change_hamza(text):
+    hamzas = [chr(0x0625), chr(0x0624), chr(0x0623), chr(0x0626), chr(0x0621)]
+    for h in hamzas:
+        text = text.replace(h, chr(0x0621))
+
+    return text
+    
+def change_text(text, word):
+    words = text.split(' ')
+    words[-1] = word
+    words.append('')
+
+    return ' '.join(words)
  
     

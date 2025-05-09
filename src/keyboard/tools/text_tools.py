@@ -68,9 +68,5 @@ class TextManager:
 
         return txt 
 
-#    vowels = 'aiuAYNW*'
-#    consonants = '.bdfhklmnoqrstwyzġšǧʻʼḍḏḥḫṣṭṯẓL'
-tm = TextManager('bazmduhhkANiti')
-print(tm.split_to_phonems())
-                
+
                 
