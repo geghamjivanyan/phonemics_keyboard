@@ -1,5 +1,5 @@
 import React from "react";
-import "./TypedText.css";
+import styles from "./TypedText.module.css";
 
 interface TypedTextProps {
   typedText: string;
@@ -22,13 +22,15 @@ export const TypedText: React.FC<TypedTextProps> = ({
   const hasSuggestions = suggestions && suggestions.length > 0;
 
   return (
-    <div className={`typed-text-wrapper ${hasRhythms ? "has-rhythms" : ""}`}>
+    <div
+      className={`${styles.typedTextWrapper} ${hasRhythms ? styles.hasRhythms : ""}`}
+    >
       {hasRhythms && (
-        <div className="rhythms-container">
+        <div className={styles.rhythmsContainer}>
           {rhythms.map((rhythm, index) => (
             <div
               key={index}
-              className="rhythm-item"
+              className={styles.rhythmItem}
               onClick={() => onRhythmSelect && onRhythmSelect(rhythm)}
             >
               {rhythm}
@@ -37,17 +39,17 @@ export const TypedText: React.FC<TypedTextProps> = ({
         </div>
       )}
 
-      <div className="typed-text" dir="rtl">
+      <div className={styles.typedText} dir="rtl">
         {typedText}
-        {isLoading && <span className="loading-indicator">•••</span>}
+        {isLoading && <span className={styles.loadingIndicator}>•••</span>}
       </div>
 
       {hasSuggestions && (
-        <div className="suggestions-container">
+        <div className={styles.suggestionsContainer}>
           <ul>
             {suggestions.map((suggestion, index) => (
               <li
-                className="suggestion-item"
+                className={styles.suggestionItem}
                 key={index}
                 onClick={() =>
                   onSuggestionSelect && onSuggestionSelect(suggestion)

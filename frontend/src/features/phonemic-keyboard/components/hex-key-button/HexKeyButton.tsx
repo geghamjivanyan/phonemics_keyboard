@@ -4,7 +4,7 @@ import spacebar from "../../../../assets/spacebar.svg";
 import enter from "../../../../assets/enter.svg";
 import deleteLeft from "../../../../assets/delete-left.svg";
 import dot from "../../../../assets/dot-icon.png";
-import "./HexKeyButton.css";
+import styles from "./HexKeyButton.module.css";
 
 interface HexKeyButtonProps {
   keyData: KeyboardKey;
@@ -37,24 +37,24 @@ export const HexKeyButton = memo(
     return (
       <button
         aria-label={`Key: ${keyData.arabic || keyData.action || "unknown"}`}
-        className="hex-key-wrapper"
+        className={styles.hexKeyWrapper}
         style={{ backgroundColor: keyData.color }}
         onClick={onClick}
       >
         {isSwitchKey ? (
-          <span className="switch-label">{iconSrc}</span>
+          <span className={styles.switchLabel}>{iconSrc}</span>
         ) : iconSrc ? (
           <img
-            src={iconSrc}
             alt={`${keyData.action} icon`}
+            className={styles.hexImg}
+            src={iconSrc}
             width={40}
             height={40}
-            className="hex-img"
           />
         ) : (
-          <span className="arabic">{keyData.arabic}</span>
+          <span className={styles.arabic}>{keyData.arabic}</span>
         )}
-        <span className="english">{keyData.english}</span>
+        <span className={styles.english}>{keyData.english}</span>
       </button>
     );
   },

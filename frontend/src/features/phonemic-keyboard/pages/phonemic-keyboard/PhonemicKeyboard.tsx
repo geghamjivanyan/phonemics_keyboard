@@ -10,7 +10,7 @@ import {
 import { KeyboardVersion } from "../../constant";
 import { Keyboard } from "../../components/keyboard";
 import { TypedText } from "../../components/typed-text";
-import "./PhonemicKeyboard.css";
+import styles from "./PhonemicKeyboard.module.css";
 
 const INITIAL_SPACE = " ";
 
@@ -200,7 +200,7 @@ export const PhonemicKeyboard = () => {
   };
 
   return (
-    <div className="keyboard-container">
+    <div className={styles.keyboardContainer}>
       <Keyboard version={keyboardVersion} onKeyClick={handleKeyClick} />
       <TypedText
         typedText={transformedText}

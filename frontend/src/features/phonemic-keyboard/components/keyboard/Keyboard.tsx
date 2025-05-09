@@ -3,7 +3,7 @@ import { KEYBOARD_1, KEYBOARD_2 } from "../../utils";
 import { type KeyboardKey } from "../../interface";
 import { KeyboardVersion } from "../../constant";
 import { HexKeyButton } from "../hex-key-button";
-import "./Keyboard.css";
+import styles from "./Keyboard.module.css";
 
 interface KeyboardProps {
   version: KeyboardVersion;
@@ -25,10 +25,10 @@ export const Keyboard: React.FC<KeyboardProps> = memo(
     const activeKeyboard = KEYBOARD_MAP[version];
 
     return (
-      <div className="keyboard">
+      <div className={styles.keyboard}>
         {activeKeyboard.map((row, rowIndex) => (
           <div
-            className="keyboard-row"
+            className={styles.keyboardRow}
             key={rowIndex}
             style={{ "--row-index": rowIndex } as CSSProperties}
           >
