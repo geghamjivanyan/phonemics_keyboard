@@ -2,9 +2,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  text-align: center;
 
   .header {
-    height: var(--page-header-height);
+    text-align: center;
+    padding: 4px 0;
   }
 }
