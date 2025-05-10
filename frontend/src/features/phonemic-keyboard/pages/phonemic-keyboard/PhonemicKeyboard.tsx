@@ -105,7 +105,7 @@ export const PhonemicKeyboard = () => {
         setLastOperation({ type: "api", data: responseData.data.text });
       }
     } catch (error: unknown) {
-      console.error("Error fetching suggestions:", error);
+      console.error("[Phonemics Keyboard] Error fetching suggestions:", error);
     } finally {
       setIsLoading(false);
     }
