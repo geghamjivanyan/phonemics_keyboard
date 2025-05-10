@@ -6,4 +6,4 @@ From correct path `npm run dev`
 `npx prettier --write .` 
 
 # Exposed Port
-5273 `http://localhost:5173/`
+3000 `http://localhost:3000/`
