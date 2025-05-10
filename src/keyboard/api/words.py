@@ -1,10 +1,13 @@
 #
 import json
+from typing import List, Optional, Dict, Any
 
 #
 from django.views.generic import View
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models.functions import Right
+from django.core.exceptions import ValidationError
+from django.db import transaction
 
 from ..models.words import Word
 from ..models.koran import Koran
@@ -20,63 +23,101 @@ from ..tools.transformation_tools import classify, split, apply_transformation_r
 
 
 class WordView(View):
+    """View for handling word-related operations."""
 
-    def get(self, request):
-        count = int(request.GET.get("count", None))
-        blocks = Koran.objects.filter(id__gt=count*600, id__lt=(count+1)*600-1)
-
-        for block in blocks:
-            words = block.arabic.split(' ')
-            shrifts = block.easy_shrift.split(' ')
-
-            if len(words) == 2:
-                w, _ = Word.objects.get_or_create(
-                    current=words[0], 
-                    next=words[1]
-                )
-                w.es_current=shrifts[0]
-                w.es_next=shrifts[1]
-                w.save()
-            elif len(words) == 1:
-                w, _ = Word.objects.get_or_create(
-                    current=words[0], 
-                    next=None
-                )
-                w.es_current=shrifts[0]
-                w.es_next=None
-                w.save()
-            else:
-                w, _ = Word.objects.get_or_create(current=words[0], next=words[1])
-                w.es_current=shrifts[0]
-                w.es_next=shrifts[1]
-                w.save()
-                                
-                for i in range(1, len(words)-1, 1):
-                    w, _ = Word.objects.get_or_create(
-                        current=words[i], 
-                        next=words[i+1]
-                    )
-                    w.es_current=shrifts[i]
-                    w.es_next=shrifts[i+1]
-                    w.save()
-                
-                w, _ = Word.objects.get_or_create(
-                    current=words[-1], 
-                    next=None
-                )
-                w.es_current=shrifts[-1]
-                w.es_next=None    
-                w.save()
-                
+    def get(self, request) -> HttpResponse:
+        """
+        Get words from Koran blocks.
+        
+        Args:
+            request: HTTP request object containing count parameter
             
-        return HttpResponse(
-            status=200,
-            content_type="application/json; charset=utf-8",
+        Returns:
+            HttpResponse with status 200 if successful
+        """
+        try:
+            count = int(request.GET.get("count", 0))
+            blocks = Koran.objects.filter(
+                id__gt=count*600,
+                id__lt=(count+1)*600-1
+            )
+            
+            with transaction.atomic():
+                for block in blocks:
+                    self._process_koran_block(block)
+                    
+            return HttpResponse(
+                status=200,
+                content_type="application/json; charset=utf-8",
+            )
+        except (ValueError, ValidationError) as e:
+            return JsonResponse(
+                {"error": str(e)},
+                status=400
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": "Internal server error"},
+                status=500
+            )
+
+    def _process_koran_block(self, block: Koran) -> None:
+        """Process a single Koran block and create/update Word objects."""
+        words = block.arabic.split(' ')
+        shrifts = block.easy_shrift.split(' ')
+
+        if len(words) == 2:
+            self._create_or_update_word(words[0], words[1], shrifts[0], shrifts[1])
+        elif len(words) == 1:
+            self._create_or_update_word(words[0], None, shrifts[0], None)
+        else:
+            # Process first word
+            self._create_or_update_word(words[0], words[1], shrifts[0], shrifts[1])
+            
+            # Process middle words
+            for i in range(1, len(words)-1):
+                self._create_or_update_word(
+                    words[i],
+                    words[i+1],
+                    shrifts[i],
+                    shrifts[i+1]
+                )
+            
+            # Process last word
+            self._create_or_update_word(
+                words[-1],
+                None,
+                shrifts[-1],
+                None
+            )
+
+    def _create_or_update_word(
+        self,
+        current: str,
+        next_word: Optional[str],
+        es_current: str,
+        es_next: Optional[str]
+    ) -> None:
+        """Create or update a Word object."""
+        word, _ = Word.objects.get_or_create(
+            current=current,
+            next=next_word
         )
+        word.es_current = es_current
+        word.es_next = es_next
+        word.save()
 
     @staticmethod
-    def remove_dots(text):
-
+    def remove_dots(text: str) -> str:
+        """
+        Remove dots and diacritics from text.
+        
+        Args:
+            text: Input text to process
+            
+        Returns:
+            Processed text without dots and diacritics
+        """
         text = text.encode('utf-8')
         
         for d in D.diacritics:
@@ -88,211 +129,268 @@ class WordView(View):
         return text.decode('utf-8')
 
     @staticmethod
-    def remove(request):
-        objs = Word.objects.all()
-        for obj in objs:
-            obj.delete()
-
-        return HttpResponse(
-            status=200,
-            content_type="application/json; charset=utf-8",
-        )
+    def remove(request) -> HttpResponse:
+        """
+        Remove all Word objects.
+        
+        Args:
+            request: HTTP request object
+            
+        Returns:
+            HttpResponse with status 200 if successful
+        """
+        try:
+            with transaction.atomic():
+                Word.objects.all().delete()
+            
+            return HttpResponse(
+                status=200,
+                content_type="application/json; charset=utf-8",
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": "Failed to remove words"},
+                status=500
+            )
 
     @staticmethod
-    def search(request):
-
-        body = json.loads(request.body)
-        print("BODY", body)
-        text = body.get('text', None)
-        rhythms = body.get('rhythms', None)
-        keyboard = body.get('keyboard', None)
-
-        data = {
-            "rhythms": rhythms,
-            "suggestions": None,
-            "text": text,
-            "is_hamza": False,
-        }
-
-        #mode = is_keyboard_changed(mode, text)
-
-        suggestions = WordView._manage_hamza(text, keyboard)
-        data['suggestions'] = suggestions
-
-        if len(suggestions) == 1:
-            text = change_text(text, suggestions[0])
-            data['suggestions'] = []
-            data['text'] = text
-        elif len(suggestions) > 1:
-            data['suggestions'] = suggestions
-            data['is_hamza'] = True    
-        else:
-            if text[-1] == " ":        
-                suggestions = WordView._suggest_next_word(text, rhythms)
-            else:        
-                suggestions = WordView._suggest_next_syllable(text, rhythms)
+    def search(request) -> HttpResponse:
+        """
+        Search for word suggestions based on input text and rhythms.
+        
+        Args:
+            request: HTTP request object containing text, rhythms, and keyboard parameters
             
-        data['rhythms'] = WordView._suggest_rhythms(text, rhythms)
-        return HttpResponse(
-            json.dumps({"data": data}),
-            status=200,
-            content_type="application/json; charset=utf-8",
-        )
+        Returns:
+            HttpResponse with suggestions data
+        """
+        try:
+            body = json.loads(request.body)
+            text = body.get('text', '')
+            rhythms = body.get('rhythms', [])
+            keyboard = body.get('keyboard', 0)
+
+            data = {
+                "rhythms": rhythms,
+                "suggestions": None,
+                "text": text,
+                "is_hamza": False,
+            }
+
+            # Handle hamza suggestions
+            suggestions = WordView._manage_hamza(text, keyboard)
+            data['suggestions'] = suggestions
+
+            if len(suggestions) == 1:
+                text = change_text(text, suggestions[0])
+                data['suggestions'] = []
+                data['text'] = text
+            elif len(suggestions) > 1:
+                data['suggestions'] = suggestions
+                data['is_hamza'] = True    
+            else:
+                if text[-1] == " ":        
+                    suggestions = WordView._suggest_next_word(text, rhythms)
+                else:        
+                    suggestions = WordView._suggest_next_syllable(text, rhythms)
+                
+            data['rhythms'] = WordView._suggest_rhythms(text, rhythms)
+            
+            return JsonResponse({"data": data})
+            
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Invalid JSON in request body"},
+                status=400
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": "Internal server error"},
+                status=500
+            )
     
     @staticmethod
-    def _suggest_next_syllable(text, rhythms):
-
+    def _suggest_next_syllable(text: str, rhythms: Optional[List[str]]) -> List[str]:
+        """
+        Suggest next syllable based on input text and rhythms.
+        
+        Args:
+            text: Input text
+            rhythms: List of rhythm patterns
+            
+        Returns:
+            List of suggested syllables
+        """
         arabic = from_arabic_to_translit(text[1:])
-        print("ARABIC", arabic)
-        if arabic:
-            if len(arabic) >= 3:
-                cut = split(arabic)
-            else:
-                cut = arabic
-        else:
+        if not arabic:
             return []
 
-        print("CUT\n", cut)
+        cut = split(arabic) if len(arabic) >= 3 else arabic
         syllables = cut.split(' ')
-        print("SYLLABLES\n", syllables)
         data = []
         
         if len(syllables) > 1:
             rows = TranslitWord.objects.filter(
-                    prev__iexact=syllables[-2], 
-                    current__iexact=syllables[-1]
-                )
-            for row in rows:
-                if row.next:
-                    data.append(from_translit_to_arabic(row.next))
-
+                prev__iexact=syllables[-2],
+                current__iexact=syllables[-1]
+            )
+            data = [from_translit_to_arabic(row.next) for row in rows if row.next]
         else:
-            rows = TranslitWord.objects.filter(
-                    prev__iexact=syllables[0] 
-                )
-            for row in rows:
-                if row.current:
-                    data.append(from_translit_to_arabic(row.current))
+            rows = TranslitWord.objects.filter(prev__iexact=syllables[0])
+            data = [from_translit_to_arabic(row.current) for row in rows if row.current]
 
         data = sort_by_frequency(data)
-
         pattern = classify(text)
-        
         n = len(pattern)
         
+        if rhythms is None:
+            rhythms = [r['name'] for r in Rhythm.objects.values('name')]
+
         suggestions = []
-
-        if rhythms == None:
-            rhythms = []
-            rs = Rhythm.objects.values('name')
-            for r in rs:
-                rhythms.append(r['name'])
-
         for rhythm in rhythms:
             r = Rhythm.objects.get(name=rhythm)
-            next = r.pattern[n]
+            next_pattern = r.pattern[n]
+            
             for d in data:
                 if len(d) == 1:
-                    if next == 1 and n == len(r.pattern) - 1:
+                    if next_pattern == 1 and n == len(r.pattern) - 1:
                         suggestions.append(d)
-                elif classify(d) == next:
+                elif classify(d) == next_pattern:
                     suggestions.append(d)
 
         return suggestions
     
     @staticmethod
-    def _suggest_rhythms(text, rhythms):
+    def _suggest_rhythms(text: str, rhythms: Optional[List[str]]) -> List[str]:
+        """
+        Suggest rhythms based on input text.
+        
+        Args:
+            text: Input text
+            rhythms: List of current rhythms
+            
+        Returns:
+            List of suggested rhythms
+        """
         text = from_arabic_to_translit(text[1:])
         parts = split(text)
         pattern = classify(parts)
         
-        if rhythms:
-            if rhythms[0].startswith(pattern):
-                return rhythms
+        if rhythms and rhythms[0].startswith(pattern):
+            return rhythms
         
-        rhythms = Rhythm.objects.all()
-        data = []
-        
-        for r in rhythms:
-            if r.pattern.startswith(pattern):
-                data.append(r.name)
-    
-        return data
+        return [
+            r.name for r in Rhythm.objects.all()
+            if r.pattern.startswith(pattern)
+        ]
 
-    def _suggest_next_word(text, rhythms):
-        if rhythms == None:
-            rhythms = Rhythm.objects.values('name')
+    @staticmethod
+    def _suggest_next_word(text: str, rhythms: Optional[List[str]]) -> List[str]:
+        """
+        Suggest next word based on input text and rhythms.
+        
+        Args:
+            text: Input text
+            rhythms: List of rhythm patterns
+            
+        Returns:
+            List of suggested words
+        """
+        if rhythms is None:
+            rhythms = [r['name'] for r in Rhythm.objects.values('name')]
 
         text = text.strip().split(' ')[-1]
         S, M, L = WordView.get_S_M_L(text)
-
         cut = split(from_arabic_to_translit(text))
-
         pattern = classify(cut)
-        suggestions = []
+        suggestions = set()
 
         for rhythm in rhythms:
             r = Rhythm.objects.get(name=rhythm)
+            if not r.pattern.startswith(pattern):
+                continue
 
-            if r.pattern.startswith(pattern):
-                words = Word.objects.filter(current=text)
+            words = Word.objects.filter(current=text)
+            for word in words:
+                if not word.next:
+                    continue
+                    
+                SW, MW, LW = WordView.get_S_M_L(word.next)
+                ptr = classify(SW+MW)
+                
+                if not r.pattern.startswith(pattern+ptr):
+                    continue
+                    
+                tr_word = from_arabic_to_translit(word.next)
+                
+                # Check various conditions for word suggestions
+                if (not is_vowel(tr_word[0]) and
+                    len(L) == 2 and
+                    not is_vowel(L[0]) and
+                    is_vowel(L[1])):
+                    suggestions.add(word.next)
+                elif (len(L) == 3 and
+                      not is_vowel(L[0]) and
+                      is_vowel(L[1]) and
+                      is_vowel(L[2])):
+                    suggestions.add(word.next)
+                elif (len(L) == 3 and
+                      not is_vowel(L[0]) and
+                      is_vowel(L[1]) and
+                      not is_vowel(L[2])):
+                    if classify(split(L + SW)) == '12':
+                        suggestions.add(word.next)
 
-                for word in words:
-                    SW, MW, LW = WordView.get_S_M_L(word.next)
-                    ptr = classify(SW+MW)
-                    if r.pattern.startswith(pattern+ptr):
-                        tr_word = from_arabic_to_translit(word.next)
-                        if not is_vowel(tr_word[0]) and \
-                            len(L) == 2 and \
-                            not is_vowel(L[0]) and\
-                            is_vowel(L[1]):
-                            suggestions.append(word.next)
-                        elif len(L) == 3 and not is_vowel(L[0]) and is_vowel(L[1]) and is_vowel(L[2]):
-                            suggestions.append(word.next)
-                        elif len(L) == 3 and not is_vowel(L[0]) and is_vowel(L[1]) and not is_vowel(L[2]):
-                            if classify(split(L + SW)) == '12':
-                                suggestions.append(word.next)
+        return list(suggestions)
 
-        return list(set(suggestions))
-
-    def get_S_M_L(text):
+    @staticmethod
+    def get_S_M_L(text: str) -> tuple[str, str, str]:
+        """
+        Split text into S (start), M (middle), and L (last) parts.
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Tuple of (S, M, L) parts
+        """
         text = apply_transformation_rules(text)
         text = from_arabic_to_translit(text)
-        S = ''
-        M = ''
-        L = ''
-
-        # get first cv index
-        i = 0 
-        while i < len(text) -1:
+        
+        # Find first CV index
+        i = 0
+        while i < len(text) - 1:
             if not is_vowel(text[i]) and is_vowel(text[i+1]):
                 break
-            else:
-                i += 1
+            i += 1
         
-        # S part
         S = text[:i]
-
-        # get last cv index
+        
+        # Find last CV index
         j = len(text) - 1
         while j > 1:
             if is_vowel(text[j]) and not is_vowel(text[j-1]):
                 j -= 1
                 break
-            else:
-                j -= 1
+            j -= 1
         
-        # L part
-        L = text[j:]  
-        
-        # M part
+        L = text[j:]
         M = text[i:j]
-
+        
         return S, M, L
 
     @staticmethod
-    def _manage_hamza(text, keyboard):
-
+    def _manage_hamza(text: str, keyboard: int) -> List[str]:
+        """
+        Manage hamza suggestions based on input text and keyboard type.
+        
+        Args:
+            text: Input text
+            keyboard: Keyboard type (0 or 1)
+            
+        Returns:
+            List of hamza suggestions
+        """
         words = text.split(' ')
         word = change_hamza(words[-1])
         hmz = HamzaWord.objects.filter(hamza=word)
