@@ -21,6 +21,7 @@ from ..tools.constants import Diacritics as D
 from ..tools.transformation_tools import from_arabic_to_translit, from_translit_to_arabic 
 from ..tools.transformation_tools import classify, split, apply_transformation_rules
 
+from .hamza_words import HamzaWordView
 
 class WordView(View):
     """View for handling word-related operations."""
@@ -169,6 +170,7 @@ class WordView(View):
             text = body.get('text', '')
             rhythms = body.get('rhythms', [])
             keyboard = body.get('keyboard', 0)
+            is_changed = body.get('keyboardChanged', False)
 
             data = {
                 "rhythms": rhythms,
@@ -177,6 +179,11 @@ class WordView(View):
                 "is_hamza": False,
             }
 
+            if is_changed:
+                text = WordView._change_text(text, keyboard)
+                data['text'] = text
+                return JsonResponse({"data": data})
+            
             # Handle hamza suggestions
             suggestions = WordView._manage_hamza(text, keyboard)
             data['suggestions'] = suggestions
@@ -445,6 +452,20 @@ class WordView(View):
         return suggestions
     """
 
+    @staticmethod
+    def _change_text(text, keyboard):
+
+        if keyboard == 2:
+            text = HamzaWordView.remove_dots(text)
+            return text
+
+        words = text.split(' ')
+        for i in range(len(words)):
+            words[i] = HamzaWord.objects.get(easy_shrift=words[i])
+
+        return ' ' + ' '.join(words)
+    
+    
 """
 { pattern: new RegExp(" كَالل", "u"), replace: " كَالل" },
 
