@@ -279,17 +279,20 @@ class WordView(View):
         Returns:
             List of suggested rhythms
         """
-        text = from_arabic_to_translit(text[1:])
-        parts = split(text)
-        pattern = classify(parts)
+        try:
+            text = from_arabic_to_translit(text[1:])
+            parts = split(text)
+            pattern = classify(parts)
         
-        if rhythms and rhythms[0].startswith(pattern):
-            return rhythms
+            if rhythms and rhythms[0].startswith(pattern):
+                return rhythms
         
-        return [
-            r.name for r in Rhythm.objects.all()
-            if r.pattern.startswith(pattern)
-        ]
+            return [
+                r.name for r in Rhythm.objects.all()
+                if r.pattern.startswith(pattern)
+            ]
+        except:
+            return []
 
     @staticmethod
     def _suggest_next_word(text: str, rhythms: Optional[List[str]]) -> List[str]:
