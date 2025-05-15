@@ -1,18 +1,20 @@
 FROM node:20-alpine
 WORKDIR /app
 
-# Install deps
+# Install dependencies
 COPY frontend/package*.json ./
 RUN npm ci
 
+# Copy the rest of the files
 COPY . .
 
-# Vite dev server
+# Explicitly set Vite's host and port configuration
 ENV HOST=0.0.0.0
-# Set environment variables for hot reloading
+ENV PORT=3000
 
-# Expose port
+# Add non-root user for Linux permissions
+RUN chown -R node:node /app
+USER node
+
 EXPOSE 3000
-# Start the application
-CMD ["npm", "run", "dev", "--", "--host", "--port", "3000"]
-
+CMD ["npm", "run", "dev", "--", "--port", "3000"]
