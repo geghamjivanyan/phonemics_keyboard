@@ -176,7 +176,7 @@ class WordView(View):
                 "rhythms": rhythms,
                 "suggestions": None,
                 "text": text,
-                "is_hamza": False,
+                "isHamza": False,
             }
 
             if is_changed:
@@ -186,6 +186,7 @@ class WordView(View):
             
             # Handle hamza suggestions
             suggestions = WordView._manage_hamza(text, keyboard)
+
             data['suggestions'] = suggestions
 
             if len(suggestions) == 1:
@@ -194,7 +195,7 @@ class WordView(View):
                 data['text'] = text
             elif len(suggestions) > 1:
                 data['suggestions'] = suggestions
-                data['is_hamza'] = True    
+                data['isHamza'] = True    
             else:
                 if text[-1] == " ":        
                     suggestions = WordView._suggest_next_word(text, rhythms)
@@ -462,9 +463,9 @@ class WordView(View):
             text = HamzaWordView.remove_dots(text)
             return text
 
-        words = text.split(' ')
+        words = text.strip().split(' ')
         for i in range(len(words)):
-            words[i] = HamzaWord.objects.get(easy_shrift=words[i])
+            words[i] = HamzaWord.objects.get(easy_shrift=words[i]).phonemic
 
         return ' ' + ' '.join(words)
     
