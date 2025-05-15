@@ -72,9 +72,8 @@ class TranslitKoranView(View):
     def limit_consecutive_letters(text):
         # Replace any letter appearing more than twice consecutively with only two occurrences
         res =  re.sub(r'(.)\1{2,}', r'\1\1', text)
-        print("RES", res)
         res = res.replace('N', '').replace('W', '').replace('Y','')
-        print("RES 2", res)
+
         s = ''
         i = 0
         while i < len(res)-1:
