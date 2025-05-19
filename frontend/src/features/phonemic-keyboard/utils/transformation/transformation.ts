@@ -183,6 +183,8 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ً", "u"), replace: "ً " },
   { pattern: new RegExp("ٍ", "u"), replace: "ٍ " },
   { pattern: new RegExp("ٌ", "u"), replace: "ٌ " },
+  { pattern: new RegExp("ً ّا", "u"), replace: "ّاً " },
+  { pattern: new RegExp("ً ا", "u"), replace: "اً " },
 
   { pattern: new RegExp("  ", "u"), replace: ", " },
   { pattern: new RegExp(",,", "u"), replace: ". " },
