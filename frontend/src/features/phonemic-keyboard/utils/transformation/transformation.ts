@@ -5,15 +5,70 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
 
   { pattern: new RegExp("ـ", "u"), replace: " " },
 
+  // space+tanween=vn
   { pattern: new RegExp(" ً", "u"), replace: " أَن" },
   { pattern: new RegExp(" ٌ", "u"), replace: " أُن" },
   { pattern: new RegExp(" ٍ", "u"), replace: " إِن" },
 
-  { pattern: new RegExp(" ءَ", "u"), replace: " أَ" },
-  { pattern: new RegExp(" ءُ", "u"), replace: " أُ" },
-  { pattern: new RegExp(" ءِ", "u"), replace: " إِ" },
-  { pattern: new RegExp("أََ", "u"), replace: "آ" },
+  // tanween at ends
+  //{ pattern: new RegExp("ِي", "u"), replace: "" },
+  //{ pattern: new RegExp("", "u"), replace: "" },
+  //{ pattern: new RegExp("", "u"), replace: "" },
+  //{ pattern: new RegExp("", "u"), replace: "" },
 
+  
+  // space+hamza put correctly
+  { pattern: new RegExp(" ء", "u"), replace: " أ" },
+  { pattern: new RegExp(" أِ", "u"), replace: " إِ" },
+  { pattern: new RegExp("أََ", "u"), replace: "آ" },
+  
+  // bi+hamza
+  { pattern: new RegExp("بِء", "u"), replace: "بِئ" },
+  { pattern: new RegExp("بِئَ", "u"), replace: "بِأَ" },
+  { pattern: new RegExp("بِئُ", "u"), replace: "بِأُ" },
+  { pattern: new RegExp("بِئِ", "u"), replace: "بِإِ" },
+  
+  // space + bi + u
+  { pattern: new RegExp(" بُِ", "u"), replace: " بِو" },
+  { pattern: new RegExp("وَبُِ", "u"), replace: "وَبِو" },
+  { pattern: new RegExp("كَبُِ", "u"), replace: "كَبِو" },
+  { pattern: new RegExp("فَبُِ", "u"), replace: "فَبِو" },
+  { pattern: new RegExp("أَبُِ", "u"), replace: "أَبِو" },
+  
+  // space + li + u
+  { pattern: new RegExp(" لُِ", "u"), replace: " لِو" },
+  { pattern: new RegExp("وَلُِ", "u"), replace: "وَلِو" },
+  { pattern: new RegExp("كَلُِ", "u"), replace: "كَلِو" },
+  { pattern: new RegExp("فَلُِ", "u"), replace: "فَلِو" },
+  { pattern: new RegExp("أَلُِ", "u"), replace: "أَلِو" },
+
+  // damma+damma and kasra+kasra and add more
+  { pattern: new RegExp("ُُ", "u"), replace: "ُو" },
+  { pattern: new RegExp("ُوُ", "u"), replace: "وُو" },
+  { pattern: new RegExp("وُوُ", "u"), replace: "وُوّ" },
+  { pattern: new RegExp("ِِ", "u"), replace: "ِي" },
+  { pattern: new RegExp("ِيِ", "u"), replace: "يِي" },
+  { pattern: new RegExp("يِيِ", "u"), replace: "يِيّ" },
+  
+  
+  // space + damma/kasra = space + w/y + damma/kasra
+  { pattern: new RegExp(" ُ", "u"), replace: " و" },
+  { pattern: new RegExp(" ِ", "u"), replace: " ي" },
+  
+  // simple vowel combination rule a+u, a+i, u+a, i+a
+  { pattern: new RegExp("َُ", "u"), replace: "َو" }, 
+  { pattern: new RegExp("اُ", "u"), replace: "او" },
+  { pattern: new RegExp("َِ", "u"), replace: "َي" },
+  { pattern: new RegExp("اِ", "u"), replace: "اي" },
+  { pattern: new RegExp("َُ", "u"), replace: "وَ" },
+  { pattern: new RegExp("َِ", "u"), replace: "يَ" },
+
+  // al + hamza
+  { pattern: new RegExp("الءَ", "u"), replace: "الأَ" },
+  { pattern: new RegExp("الءُ", "u"), replace: "الأُ" },
+  { pattern: new RegExp("الءِ", "u"), replace: "الإِ" },
+
+  ///////////////////
   { pattern: new RegExp("ُُ", "u"), replace: "ُو" },
   { pattern: new RegExp("ِِ", "u"), replace: "ِي" },
 
@@ -185,7 +240,6 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp("ٌ", "u"), replace: "ٌ " },
   { pattern: new RegExp("ً ّا", "u"), replace: "ّاً " },
   { pattern: new RegExp("ً ا", "u"), replace: "اً " },
-  
 
   //{ pattern: new RegExp("  ", "u"), replace: ", " },
   //{ pattern: new RegExp(",,", "u"), replace: ". " },
