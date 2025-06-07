@@ -167,7 +167,7 @@ export const PhonemicKeyboard = () => {
       });
       setLastOperation({ type: "replace", data: suggestion });
     } else {
-      setTransformedText((prev) => prev + suggestion);
+      setTransformedText((prev) => prev + suggestion + " ");
       setLastOperation({ type: "insert", data: suggestion });
     }
   };
