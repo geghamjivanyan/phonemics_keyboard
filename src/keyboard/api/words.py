@@ -153,6 +153,46 @@ class WordView(View):
                 {"error": "Failed to remove words"},
                 status=500
             )
+        
+    @staticmethod
+    def shadda(request) -> HttpResponse:
+        """
+        Apply shadda rules.
+        
+        Args:
+            request: HTTP request object
+            
+        Returns:
+            HttpResponse with status 200 if successful
+        """
+        #(064e, 064f, 0650) + 0651
+        rules = {
+            chr(0x064e) + chr(0x0651): chr(0x0651) + chr(0x064e), 
+            chr(0x064f) + chr(0x0651): chr(0x0651) + chr(0x064f),
+            chr(0x0650) + chr(0x0651): chr(0x0651) + chr(0x0650),
+        }    
+
+        try:
+            words = Word.objects.all()
+
+            for word in words:
+                for k in rules:
+                    word.current.replace(k, rules[k])
+                    if word.next:
+                        word.next.replace(k, rules[k])
+                word.save()
+
+            
+            return HttpResponse(
+                status=200,
+                content_type="application/json; charset=utf-8",
+            )
+        except Exception as e:
+            print("Error", e)
+            return JsonResponse(
+                {"error": "Failed to update shadda rules"},
+                status=500
+            )
 
     @staticmethod
     def search(request) -> HttpResponse:
@@ -167,17 +207,25 @@ class WordView(View):
         """
         try:
             body = json.loads(request.body)
+            print("BDY", body)
             text = body.get('text', '')
             rhythms = body.get('rhythms', [])
             keyboard = body.get('keyboard', 0)
             is_changed = body.get('keyboardChanged', False)
 
+            print("Search request - text:", text)
+            print("Search request - rhythms:", rhythms)
+            print("Search request - keyboard:", keyboard)
+            print("Search request - is_changed:", is_changed)
+
             data = {
                 "rhythms": rhythms,
-                "suggestions": None,
+                "suggestions": [],
                 "text": text,
                 "isHamza": False,
+                "last_word": []
             }
+            print("BODY", data)
 
             if is_changed:
                 text = WordView._change_text(text, keyboard)
@@ -186,6 +234,7 @@ class WordView(View):
             
             # Handle hamza suggestions
             suggestions = WordView._manage_hamza(text, keyboard)
+            print("Hamza suggestions:", suggestions)
 
             data['suggestions'] = suggestions
 
@@ -201,17 +250,23 @@ class WordView(View):
                     suggestions = WordView._suggest_next_word(text, rhythms)
                 else:        
                     suggestions = WordView._suggest_next_syllable(text, rhythms)
-                
+                data['suggestions'] = suggestions
             data['rhythms'] = WordView._suggest_rhythms(text, rhythms)
-            
+            data['last_word'] = WordView.suggest_new_line(text)
+            print("Final data:", data)
             return JsonResponse({"data": data})
             
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print("JSON Decode Error:", str(e))
             return JsonResponse(
                 {"error": "Invalid JSON in request body"},
                 status=400
             )
         except Exception as e:
+            print("Unexpected error in search:", str(e))
+            print("Error type:", type(e).__name__)
+            import traceback
+            print("Traceback:", traceback.format_exc())
             return JsonResponse(
                 {"error": "Internal server error"},
                 status=500
@@ -248,22 +303,30 @@ class WordView(View):
             data = [from_translit_to_arabic(row.current) for row in rows if row.current]
 
         data = sort_by_frequency(data)
-        pattern = classify(text)
+        print("DATA", data)
+        pattern = classify(cut)
+        print("TEXT", pattern)
         n = len(pattern)
+
+        if type(rhythms) == str:
+            rhythms = [rhythms]
         
         if rhythms is None:
             rhythms = [r['name'] for r in Rhythm.objects.values('name')]
 
         suggestions = []
+        print("RRRRR", rhythms)
         for rhythm in rhythms:
             r = Rhythm.objects.get(name=rhythm)
-            next_pattern = r.pattern[n]
+            print("LEN", n, len(r.pattern))
+            if n == len(2*r.pattern):
+                continue
+            print("RHYTHMS", r.pattern, (2*r.pattern)[n])
+            next_pattern = (2*r.pattern)[n]
             
             for d in data:
-                if len(d) == 1:
-                    if next_pattern == 1 and n == len(r.pattern) - 1:
-                        suggestions.append(d)
-                elif classify(d) == next_pattern:
+                print("CLASS", classify(d))
+                if classify(d) == next_pattern:
                     suggestions.append(d)
 
         return suggestions
@@ -280,20 +343,52 @@ class WordView(View):
         Returns:
             List of suggested rhythms
         """
+        print("=== _suggest_rhythms START ===")
+        print("Input text:", text)
+        print("Input rhythms:", rhythms)
+        
         try:
+            if not text:
+                print("Empty text input")
+                return []
+                
+            print("Text length:", len(text))
+            print("First character:", text[0] if text else "empty")
+            
             text = from_arabic_to_translit(text[1:])
+            print("After transliteration:", text)
+            
             parts = split(text)
+            print("After split:", parts)
+            
             pattern = classify(parts)
-        
+            print("Pattern:", pattern)
+            
             if rhythms and rhythms[0].startswith(pattern):
+                print("Using existing rhythms")
                 return rhythms
-        
-            return [
-                r.name for r in Rhythm.objects.all()
-                if r.pattern.startswith(pattern)
+            
+            print("Querying database for rhythms")
+            all_rhythms = Rhythm.objects.all()
+            print("Found rhythms count:", all_rhythms.count())
+            
+            result = [
+                r.name for r in all_rhythms
+                if (2*r.pattern).startswith(pattern)
             ]
-        except:
+            print("Filtered rhythms:", result)
+            print("=== _suggest_rhythms END ===")
+            return result
+            
+        except Exception as e:
+            print("=== _suggest_rhythms ERROR ===")
+            print("Error type:", type(e).__name__)
+            print("Error message:", str(e))
+            import traceback
+            print("Traceback:", traceback.format_exc())
+            print("=== _suggest_rhythms ERROR END ===")
             return []
+
 
     @staticmethod
     def _suggest_next_word(text: str, rhythms: Optional[List[str]]) -> List[str]:
@@ -307,6 +402,48 @@ class WordView(View):
         Returns:
             List of suggested words
         """
+        if type(rhythms) == str:
+            rhythms = [rhythms]
+        if rhythms is None:
+            rhythms = [r['name'] for r in Rhythm.objects.values('name')]
+
+        current = text.strip().split(' ')[-1]
+        cut = split(from_arabic_to_translit(text.strip().replace(' ', '')))
+        pattern = classify(cut)
+        suggestions = set()
+
+        for rhythm in rhythms:
+            r = Rhythm.objects.get(name=rhythm)
+            if not (2*r.pattern).startswith(pattern):
+                continue
+
+            words = Word.objects.filter(current=current)
+            for word in words:
+                if not word.next:
+                    continue
+
+                n_cut = split(from_arabic_to_translit(word.next))
+                n_pattern = classify(n_cut)
+
+                if (2*r.pattern).startswith(pattern + n_pattern):
+                    suggestions.add(word.next)
+
+        return list(suggestions)
+
+    @staticmethod
+    def _suggest_next_word_1(text: str, rhythms: Optional[List[str]]) -> List[str]:
+        """
+        Suggest next word based on input text and rhythms.
+        
+        Args:
+            text: Input text
+            rhythms: List of rhythm patterns
+            
+        Returns:
+            List of suggested words
+        """
+        if type(rhythms) == str:
+            rhythms = [rhythms]
         if rhythms is None:
             rhythms = [r['name'] for r in Rhythm.objects.values('name')]
 
@@ -315,6 +452,9 @@ class WordView(View):
         cut = split(from_arabic_to_translit(text))
         pattern = classify(cut)
         suggestions = set()
+
+        left = chr(0x064B) + ' ' + chr(0x0627)
+        right = chr(0x0627) + chr(0x064B) + ' '
 
         for rhythm in rhythms:
             r = Rhythm.objects.get(name=rhythm)
@@ -350,7 +490,8 @@ class WordView(View):
                       is_vowel(L[1]) and
                       not is_vowel(L[2])):
                     if classify(split(L + SW)) == '12':
-                        suggestions.add(word.next)
+                        
+                        suggestions.add(next + " ")
 
         return list(suggestions)
 
@@ -415,7 +556,7 @@ class WordView(View):
         
         return list(set(data))
 
-    """
+    
     @staticmethod
     def is_rhythmable(text):
         text = from_arabic_to_translit(text)
@@ -423,14 +564,17 @@ class WordView(View):
         if len(text) < 4:
             return False, 0 
         
+        # vvcc
         if is_vowel(text[-4]) and is_vowel(text[-3]) and not is_vowel(text[-2]) and is_vowel(text[-1]):
             return True, 4
         
+        # v(wy)cv
         if is_vowel(text[-4]) and not is_vowel(text[-2]) and is_vowel(text[-1]):
             if text[-3] in 'wy':
                 return True, 4
             
         if len(text) > 6:
+            # vvcvcvv
             if is_vowel(text[-7]) and is_vowel(text[-6]) and not is_vowel(text[-5]) and \
                 is_vowel(text[-4]) and not is_vowel(text[-3]) and \
                 is_vowel(text[-2]) and is_vowel(text[-1]):
@@ -443,18 +587,29 @@ class WordView(View):
     def suggest_new_line(text):
         b, t = WordView.is_rhythmable(text)
 
-        suggestions = []
-        if b:
-            suffix = text[-t:]
 
-            rhymes = Word.objects.annotate(
-                ending=Right('next', t)
-            ).filter(ending=suffix)
-    
-            suggestions = [w.next for w in rhymes]
+        text = from_arabic_to_translit(text[1:])
+        print("LW After transliteration:", text)
+            
+        parts = split(text)
+        print("LW After split:", parts)
+            
+        pattern = classify(parts)
+        print("LW Pattern:", pattern)
+        suggestions = []
+        
+        if WordView.is_end_of_line(pattern):
+            if b:
+                suffix = text[-t:]
+
+                rhymes = Word.objects.annotate(
+                    ending=Right('next', t)
+                ).filter(ending=suffix)
+        
+                suggestions = [w.next for w in rhymes]
 
         return suggestions
-    """
+    
 
     @staticmethod
     def _change_text(text, keyboard):
@@ -468,47 +623,18 @@ class WordView(View):
             words[i] = HamzaWord.objects.get(easy_shrift=words[i]).phonemic
 
         return ' ' + ' '.join(words)
+
+    @staticmethod
+    def is_end_of_line(pattern):
+        n = len(pattern)
+        if n % 2 == 0:
+            if pattern[:n//2] == pattern[n//2:]:
+                rhythms = Rhythm.objects.all()
+
+                for rhythm in rhythms:
+                    if rhythm.pattern == pattern[:n//2]:
+                        return True 
+        return False
     
+
     
-"""
-{ pattern: new RegExp(" كَالل", "u"), replace: " كَالل" },
-
-{ pattern: new RegExp(" الل", "u"), replace: " الل" },
-
-{ pattern: new RegExp(" فَالل", "u"), replace: " فَالل" },
-
-{ pattern: new RegExp(" بَِ", "u"), replace: " بِا" },
-{ pattern: new RegExp(" فَبَِ", "u"), replace: " فَبِا" },
-{ pattern: new RegExp(" وَبَِ", "u"), replace: " وَبِا" },
-
-{ pattern: new RegExp("يِ", "u"), replace: "يّ" },
-{ pattern: new RegExp("يِّ", "u"), replace: "يِّ" },
-{ pattern: new RegExp("يِّ", "u"), replace: "يِّى" },
-
-{ pattern: new RegExp("وُ", "u"), replace: "وّ" },
-{ pattern: new RegExp("وُّ", "u"), replace: "وُّ" },
-{ pattern: new RegExp("وُّ", "u"), replace: "وُّو" },
-
-{ pattern: new RegExp(" الُ", "u"), replace: " الو" },
-{ pattern: new RegExp(" الِ", "u"), replace: " الي" },
-{ pattern: new RegExp(" الءَ", "u"), replace: " الأَ" },
-
-{ pattern: new RegExp(" الءُ", "u"), replace: " الأُ" },
-{ pattern: new RegExp(" الءِ", "u"), replace: " الإِ" },
-{ pattern: new RegExp(" الل", "u"), replace: " الل" },
-
-
-{ pattern: new RegExp("َُ", "u"), replace: "َو" },
-{ pattern: new RegExp("َِ", "u"), replace: "َي" },
-{ pattern: new RegExp("َُ", "u"), replace: "وَ" },
-{ pattern: new RegExp("ُِ", "u"), replace: "وِ" },
-{ pattern: new RegExp("ُِ", "u"), replace: "ُيُ" },
-{ pattern: new RegExp("َِ", "u"), replace: "يَ" },
-
-{ pattern: new RegExp("َاُ", "u"), replace: "َاو" },
-{ pattern: new RegExp("َاِ", "u"), replace: "َاي" },
-{ pattern: new RegExp("ِيَ", "u"), replace: "ِيَ" },
-{ pattern: new RegExp("ِيُ", "u"), replace: "ِيُ" },
-{ pattern: new RegExp("ُوَ", "u"), replace: "ُوَ" },
-{ pattern: new RegExp("ُوِ", "u"), replace: "ُوِ" },
-"""

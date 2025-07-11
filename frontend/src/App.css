@@ -1,10 +1,18 @@
+* {
+  transition: none !important;
+  animation: none !important;
+}
+
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
+
 .App {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+}
 
-  .header {
-    text-align: center;
-    padding: 4px 0;
-  }
+.header {
+  text-align: center;
+  padding: 4px 0;
 }

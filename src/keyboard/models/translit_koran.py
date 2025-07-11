@@ -44,5 +44,9 @@ class TranslitKoranAdmin(admin.ModelAdmin):
         "cut_text",
         "pattern",
     )
+    search_fields = [
+        'text',
+    ]
+
 
 

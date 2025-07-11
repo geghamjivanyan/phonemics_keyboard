@@ -33,8 +33,9 @@ class Word(models.Model):
         _('next word'),
         max_length=20,
         null=True,
+        blank=True,
         validators=[
-            MinLengthValidator(1),
+            MinLengthValidator(0),
             MaxLengthValidator(20)
         ],
         db_index=True,
@@ -56,8 +57,9 @@ class Word(models.Model):
         _('easy shrift next'),
         max_length=20,
         null=True,
+        blank=True,
         validators=[
-            MinLengthValidator(1),
+            MinLengthValidator(0),
             MaxLengthValidator(20)
         ],
         help_text=_('The transliterated form of the next word')

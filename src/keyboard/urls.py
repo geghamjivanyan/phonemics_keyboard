@@ -25,6 +25,7 @@ from .api.words import WordView
 from .api.translit_koran import TranslitKoranView
 from .api.translit_words import TranslitWordView
 from .api.hamza_words import HamzaWordView
+from .api.statistics import StatisticView
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
@@ -40,7 +41,9 @@ urlpatterns = [
     path('api/koran/remove', KoranView.remove),
     path('api/koran/translit/remove', TranslitKoranView.remove),
     path('api/hamza', HamzaWordView.as_view()),
-    path('api/hamza/remove', HamzaWordView.remove)
+    path('api/hamza/remove', HamzaWordView.remove),
+    path('api/shadda', WordView.shadda),
+    path('api/statistics', StatisticView.as_view()),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

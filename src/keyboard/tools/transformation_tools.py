@@ -3,6 +3,8 @@ from typing import Dict, List, Optional, Set
 from .utils import is_vowel
 from .constants import Translit as T
 
+from .constants import TR
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,107 +44,62 @@ def from_translit_to_arabic(text: str) -> str:
         logger.error(f"Error in from_translit_to_arabic: {str(e)}", exc_info=True)
         return text
 
+def before_translit(text):
+
+    for k,v in TR.bt_1.items():
+        text = text.replace(k, v)
+
+    for k,v in TR.bt_2.items():
+        text = text.replace(k, v)
+
+    for k,v in TR.bt_3.items():
+        text = text.replace(k, v)
+
+    return text
+
+def translit(text):
+
+    for k,v in TR.tr_1.items():
+        text = text.replace(k, v)
+
+
+    for k,v in TR.tr_2.items():
+        text = text.replace(k, v)
+
+    for k,v in TR.tr_3.items():
+        text = text.replace(k, v)
+
+    return text
+
+def after_translit(text):
+
+    for k,v in TR.at_1.items():
+        text = text.replace(k,v)
+
+    return text
+
+def shadda(text):
+
+    letters = list(text)
+
+    if len(letters) >= 3:
+        for i in range(len(letters)-2):
+            if not is_vowel(letters[i]) and letters[i+1] == chr(0x0651):
+                letters[i+1] = letters[i]
+    
+    text = ''.join(letters)
+
+    return text
+
+
+
 
 def from_arabic_to_translit(text: str) -> str:
-    """
-    Convert Arabic text to transliterated form.
-    
-    Args:
-        text: Text in Arabic
-        
-    Returns:
-        str: Text converted to transliterated form
-        
-    Example:
-        >>> from_arabic_to_translit('بسم')
-        'bism'
-    """
-    try:
-        # Remove special characters
-        text = text.replace('N', '').replace('Y', '').replace('W', '')
-        
-        result = ''
-        i = 0
-        
-        # Handle initial alif
-        if text and text[0] == chr(0x0627):
-            result += chr(0x2bc) + chr(0x064E)
-            i += 1
-        
-        while i < len(text):
-            try:
-                # Handle shadda
-                if i < len(text) - 1 and text[i+1] == chr(0x0651):
-                    if text[i] not in T.to_translit:
-                        logger.warning(f"Character not found in to_translit mapping: {text[i]}")
-                        i += 2
-                        continue
-                    result += 2 * T.to_translit[text[i]]
-                    i += 2
-                    continue
-                    
-                # Handle space before alif
-                if i > 0 and text[i-1] == ' ' and text[i] == chr(0x0627):
-                    result += ' '
-                    i += 1
-                    continue
-                    
-                # Try to match two characters
-                if i+1 < len(text) and text[i:i+2] in T.to_translit:
-                    if (i > 1 and 
-                        text[i-1] in T.to_translit and 
-                        T.to_translit.get(text[i-1]) in T.a_rules and 
-                        text[i] == chr(0x064E)):
-                        result += 'A'
-                        i += 1
-                    else:
-                        result += T.to_translit[text[i:i+2]]
-                        i += 2
-                else:
-                    # Handle single character
-                    if text[i] not in T.to_translit:
-                        logger.warning(f"Character not found in to_translit mapping: {text[i]}")
-                        i += 1
-                        continue
-                        
-                    if (i > 0 and 
-                        text[i-1] == chr(0x064E) and 
-                        text[i] == chr(0x0627)):
-                        result += 'a'
-                    elif (i > 0 and 
-                          text[i-1] in T.to_translit and
-                          T.to_translit.get(text[i-1]) in T.a_rules and 
-                          text[i] == chr(0x064E)):
-                        result += 'A'
-                    elif (i > 0 and 
-                          text[i-1] in T.to_translit and
-                          T.to_translit.get(text[i-1]) in T.l_rules and 
-                          text[i] == chr(0x0644)):
-                        result += 'L'
-                    else:
-                        result += T.to_translit[text[i]]
-                    i += 1
-                    
-                # Fix common patterns
-                if len(result) >= 2:
-                    if result[-2:] == 'aA':
-                        result = result[:-2] + 'aa'
-                    elif result[-2:] == 'Aa':
-                        result = result[:-2] + 'AA'
-                        
-            except Exception as e:
-                logger.error(f"Error processing character at index {i}: {str(e)}", exc_info=True)
-                logger.error(f"Character: {text[i]}")
-                logger.error(f"Current result: {result}")
-                i += 1
-                continue
-                
-        return result
-        
-    except Exception as e:
-        logger.error(f"Critical error in from_arabic_to_translit: {str(e)}", exc_info=True)
-        logger.error(f"Input text: {text}")
-        return text  # Return original text on error
+    text = before_translit(text)
+    text = translit(text)
+    text = after_translit(text)
+    text = text.replace(' ', '')
+    return text
 
 
 def classify(text: str) -> str:
