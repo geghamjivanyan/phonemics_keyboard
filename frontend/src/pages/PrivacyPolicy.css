@@ -48,6 +48,16 @@
   font-size: 1rem;
 }
 
+.privacy-policy ul {
+  padding-left: 30px;
+  margin-left: 20px;
+}
+
+.privacy-policy li {
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
 .privacy-policy-footer {
   margin-top: 50px;
   padding-top: 20px;
@@ -76,5 +86,10 @@
   
   .privacy-policy h2 {
     font-size: 1.3rem;
+  }
+  
+  .privacy-policy ul {
+    padding-left: 20px;
+    margin-left: 15px;
   }
 } 
