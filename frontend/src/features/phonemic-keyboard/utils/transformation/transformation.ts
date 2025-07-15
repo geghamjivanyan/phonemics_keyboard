@@ -21,7 +21,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp(" ء", "u"), replace: " أ" },
   { pattern: new RegExp(" أِ", "u"), replace: " إِ" },
   { pattern: new RegExp("أََ", "u"), replace: "آ" },
-  { pattern: new RehExp("أَا", "u"), replace: "آ" },
+  { pattern: new RegExp("أَا", "u"), replace: "آ" },
   { pattern: new RegExp("اأَ", "u"), replace: "اءَ" },
   
   // tanween
