@@ -21,6 +21,26 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp(" ء", "u"), replace: " أ" },
   { pattern: new RegExp(" أِ", "u"), replace: " إِ" },
   { pattern: new RegExp("أََ", "u"), replace: "آ" },
+  { pattern: new RehExp("أَا", "u"), replace: "آ" },
+  { pattern: new RegExp("اأَ", "u"), replace: "اءَ" },
+  
+  // tanween
+  { pattern: new RegExp("جئً ", "u"), replace: "جئًا " },
+  { pattern: new RegExp("كءً ", "u"), replace: "كئًا " },
+  { pattern: new RegExp("فءً ", "u"), replace: "فئًا " },
+  { pattern: new RegExp("مءً ", "u"), replace: "مئًا " },
+  { pattern: new RegExp("لءً ", "u"), replace: "لئًا " },
+  { pattern: new RegExp("بءً ", "u"), replace: "بءًا " },
+  { pattern: new RegExp("َيءً ", "u"), replace: "َيئًا " },
+  { pattern: new RegExp("سءً ", "u"), replace: " سئًا " },
+  { pattern: new RegExp("طءً ", "u"), replace: "طئًا " },
+  { pattern: new RegExp("َوءً ", "u"), replace: "َوءًا " },
+  { pattern: new RegExp("رءً ", "u"), replace: "رءًا " },
+  { pattern: new RegExp("زءً ", "u"), replace: "زءًا " },
+  { pattern: new RegExp("دءً ", "u"), replace: "دءًا " },
+  { pattern: new RegExp("ذءً ", "u"), replace: "ذءًا " },
+  { pattern: new RegExp("ِءً ", "u"), replace: "ِئًا " },
+  { pattern: new RegExp("ِئً ", "u"), replace: "ِئًا " },
   
   // bi+hamza
   { pattern: new RegExp("بِء", "u"), replace: "بِئ" },
@@ -54,6 +74,14 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   // space + damma/kasra = space + w/y + damma/kasra
   { pattern: new RegExp(" ُ", "u"), replace: " و" },
   { pattern: new RegExp(" ِ", "u"), replace: " ي" },
+
+  // damma+damma and kasra+kasra and add more
+  { pattern: new RegExp("ُُ", "u"), replace: "ُو" },
+  { pattern: new RegExp("ُوُ", "u"), replace: "وُو" },
+  { pattern: new RegExp("وُوُ", "u"), replace: "وُوّ" },
+  { pattern: new RegExp("ِِ", "u"), replace: "ِي" },
+  { pattern: new RegExp("ِيِ", "u"), replace: "يِي" },
+  { pattern: new RegExp("يِيِ", "u"), replace: "يِيّ" },
   
   // simple vowel combination rule a+u, a+i, u+a, i+a
   { pattern: new RegExp("َُ", "u"), replace: "َو" }, 
