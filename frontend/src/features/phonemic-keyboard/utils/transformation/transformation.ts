@@ -11,7 +11,7 @@ export const ARABIC_ORTHOGRAPHIC_RULES = [
   { pattern: new RegExp(" ٍ", "u"), replace: " إِن" },
 
   // tanween at ends
-  //{ pattern: new RegExp("ِي", "u"), replace: "" },
+  { pattern: new RegExp("اأً", "u"), replace: "اءً " },
   //{ pattern: new RegExp("", "u"), replace: "" },
   //{ pattern: new RegExp("", "u"), replace: "" },
   //{ pattern: new RegExp("", "u"), replace: "" },
